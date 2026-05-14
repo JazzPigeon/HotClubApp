@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A7F3C8A12E9D7B99005B15E1 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = A7F3C8A02E9D7B99005B15E1 /* Supabase */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		9604533E2E9D7B9B005B15AE /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7F3C8A12E9D7B99005B15E1 /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = HotClubApp;
 			packageProductDependencies = (
+				A7F3C8A02E9D7B99005B15E1 /* Supabase */,
 			);
 			productName = HotClubApp;
 			productReference = 9604532B2E9D7B99005B15AE /* HotClubApp.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 960453222E9D7B99005B15AE;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A7F3C8A32E9D7B99005B15E1 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9604532C2E9D7B99005B15AE /* Products */;
 			projectDirPath = "";
@@ -400,6 +409,8 @@
 				DEVELOPMENT_TEAM = FRQ5Q2CGDN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Photograph record labels for each side.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Choose photos of record labels for each side.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -432,6 +443,8 @@
 				DEVELOPMENT_TEAM = FRQ5Q2CGDN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Photograph record labels for each side.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Choose photos of record labels for each side.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -578,6 +591,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A7F3C8A32E9D7B99005B15E1 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A7F3C8A02E9D7B99005B15E1 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A7F3C8A32E9D7B99005B15E1 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 960453232E9D7B99005B15AE /* Project object */;
 }

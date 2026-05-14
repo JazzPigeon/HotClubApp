@@ -6,16 +6,15 @@
 //
 
 import SwiftUI
-import CoreData
 
 @main
 struct HotClubAppApp: App {
-    let persistenceController = PersistenceController.shared
+    @State private var appModel = AppModel()
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+            RootView()
+                .environment(appModel)
         }
     }
 }

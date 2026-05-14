@@ -49,6 +49,9 @@ playground.xcworkspace
 
 Carthage/Build/
 
+# Local Supabase / app secrets (copy from Secrets.example.plist)
+HotClubApp/Secrets.plist
+
 # fastlane
 #
 # It is recommended to not store the screenshots in the git repo.
