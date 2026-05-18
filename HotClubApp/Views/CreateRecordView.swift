@@ -1,13 +1,13 @@
 import PhotosUI
-import PhotosUI
 import SwiftUI
 
 struct CreateRecordView: View {
     @Environment(AppModel.self) private var app
     @Environment(\.appTheme) private var theme
 
+    var onCancel: () -> Void = {}
+
     @State private var vm = CreateRecordViewModel()
-    @State private var showSaved = false
 
     var body: some View {
         @Bindable var vm = vm
@@ -20,16 +20,21 @@ struct CreateRecordView: View {
                     }
                 }
                 Section("Side A") {
-                    sideFields(side: $vm.sideA)
+                    sideAFields
                 }
                 Section("Side B") {
-                    sideFields(side: $vm.sideB)
+                    sideBFields
+                }
+                Section("Label & year") {
+                    TextField("Label", text: $vm.label)
+                    TextField("Year", text: $vm.yearText)
+                        .keyboardType(.numberPad)
                 }
                 Section {
                     Button {
                         Task {
                             let ok = await vm.submit(app: app)
-                            if ok { showSaved = true }
+                            if ok { onCancel() }
                         }
                     } label: {
                         if vm.isSubmitting {
@@ -44,25 +49,49 @@ struct CreateRecordView: View {
                 }
             }
             .navigationTitle("New record")
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Cancel") {
+                        vm.reset()
+                        onCancel()
+                    }
+                    .disabled(vm.isSubmitting)
+                }
+            }
             .scrollContentBackground(.hidden)
             .background(theme.background)
-            .alert("Saved", isPresented: $showSaved) {
-                Button("OK", role: .cancel) {}
-            } message: {
-                Text("Your record was added to Supabase.")
+            .onChange(of: vm.matchSideAArtist) { _, _ in vm.applyMatchSideAArtist() }
+            .onChange(of: vm.matchSideAComposer) { _, _ in vm.applyMatchSideAComposer() }
+            .onChange(of: vm.sideA.artist) { _, _ in vm.applyMatchSideAArtist() }
+            .onChange(of: vm.sideA.composer) { _, _ in vm.applyMatchSideAComposer() }
+            .onAppear {
+                vm.applyMatchSideAArtist()
+                vm.applyMatchSideAComposer()
             }
         }
     }
 
     @ViewBuilder
-    private func sideFields(side: Binding<SideFormState>) -> some View {
-        TextField("Song title", text: side.songTitle)
-        TextField("Artist", text: side.artist)
-        TextField("Composer", text: side.composer)
-        TextField("Label", text: side.label)
-        TextField("Year", text: side.yearText)
-            .keyboardType(.numberPad)
-        PhotosPicker(selection: side.photoItem, matching: .images, photoLibrary: .shared()) {
+    private var sideAFields: some View {
+        TextField("Song title", text: $vm.sideA.songTitle)
+        TextField("Artist", text: $vm.sideA.artist)
+        TextField("Composer", text: $vm.sideA.composer)
+        PhotosPicker(selection: $vm.sideA.photoItem, matching: .images, photoLibrary: .shared()) {
+            Label("Side image", systemImage: "photo")
+        }
+    }
+
+    @ViewBuilder
+    private var sideBFields: some View {
+        TextField("Song title", text: $vm.sideB.songTitle)
+        TextField("Artist", text: $vm.sideB.artist)
+            .disabled(vm.matchSideAArtist)
+        Toggle("Artist - Match Side A", isOn: $vm.matchSideAArtist)
+        TextField("Composer", text: $vm.sideB.composer)
+            .disabled(vm.matchSideAComposer)
+        Toggle("Composer - Match Side A", isOn: $vm.matchSideAComposer)
+        PhotosPicker(selection: $vm.sideB.photoItem, matching: .images, photoLibrary: .shared()) {
             Label("Side image", systemImage: "photo")
         }
     }
