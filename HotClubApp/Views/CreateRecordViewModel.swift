@@ -7,8 +7,6 @@ struct SideFormState {
     var songTitle = ""
     var artist = ""
     var composer = ""
-    var label = ""
-    var yearText = ""
     var photoItem: PhotosPickerItem?
 }
 
@@ -16,14 +14,42 @@ struct SideFormState {
 final class CreateRecordViewModel {
     var sideA = SideFormState()
     var sideB = SideFormState()
+    var label = ""
+    var yearText = ""
+    var matchSideAArtist = true
+    var matchSideAComposer = true
     var submitError: String?
     var isSubmitting = false
 
     func reset() {
         sideA = SideFormState()
         sideB = SideFormState()
+        label = ""
+        yearText = ""
+        matchSideAArtist = true
+        matchSideAComposer = true
         submitError = nil
         isSubmitting = false
+    }
+
+    func applyMatchSideAArtist() {
+        if matchSideAArtist {
+            sideB.artist = sideA.artist
+        }
+    }
+
+    func applyMatchSideAComposer() {
+        if matchSideAComposer {
+            sideB.composer = sideA.composer
+        }
+    }
+
+    private var sideBArtistForSubmit: String {
+        matchSideAArtist ? sideA.artist : sideB.artist
+    }
+
+    private var sideBComposerForSubmit: String {
+        matchSideAComposer ? sideA.composer : sideB.composer
     }
 
     func submit(app: AppModel) async -> Bool {
@@ -41,8 +67,7 @@ final class CreateRecordViewModel {
         defer { isSubmitting = false }
 
         do {
-            let yearA = try parsedYear(sideA.yearText)
-            let yearB = try parsedYear(sideB.yearText)
+            let year = try parsedYear(yearText)
 
             let jpegA = try await jpeg(from: sideA.photoItem)
             let jpegB = try await jpeg(from: sideB.photoItem)
@@ -65,6 +90,7 @@ final class CreateRecordViewModel {
                     try await storage.uploadJPEG(path: pathB!, data: jpegB)
                 }
 
+                let sharedLabel = opt(label)
                 let inserts = [
                     RecordSideInsert(
                         recordId: recordId,
@@ -72,18 +98,18 @@ final class CreateRecordViewModel {
                         songTitle: opt(sideA.songTitle),
                         artist: opt(sideA.artist),
                         composer: opt(sideA.composer),
-                        label: opt(sideA.label),
-                        year: yearA,
+                        label: sharedLabel,
+                        year: year,
                         imageStoragePath: pathA
                     ),
                     RecordSideInsert(
                         recordId: recordId,
                         side: .B,
                         songTitle: opt(sideB.songTitle),
-                        artist: opt(sideB.artist),
-                        composer: opt(sideB.composer),
-                        label: opt(sideB.label),
-                        year: yearB,
+                        artist: opt(sideBArtistForSubmit),
+                        composer: opt(sideBComposerForSubmit),
+                        label: sharedLabel,
+                        year: year,
                         imageStoragePath: pathB
                     ),
                 ]

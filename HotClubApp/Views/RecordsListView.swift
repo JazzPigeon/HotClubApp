@@ -36,7 +36,7 @@ struct RecordsListView: View {
             .navigationTitle("Records")
             .scrollContentBackground(.hidden)
             .background(theme.background)
-            .task { await load() }
+            .onAppear { Task { await load() } }
             .refreshable { await load() }
         }
     }
