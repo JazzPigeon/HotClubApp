@@ -45,7 +45,7 @@ struct CreateRecordView: View {
                                 .frame(maxWidth: .infinity)
                         }
                     }
-                    .disabled(vm.isSubmitting)
+                    .disabled(vm.isSubmitting || !vm.canSubmit)
                 }
             }
             .navigationTitle("New record")
@@ -74,7 +74,7 @@ struct CreateRecordView: View {
 
     @ViewBuilder
     private var sideAFields: some View {
-        TextField("Song title", text: $vm.sideA.songTitle)
+        TextField("Song title (required)", text: $vm.sideA.songTitle)
         TextField("Artist", text: $vm.sideA.artist)
         TextField("Composer", text: $vm.sideA.composer)
         PhotosPicker(selection: $vm.sideA.photoItem, matching: .images, photoLibrary: .shared()) {
@@ -84,7 +84,7 @@ struct CreateRecordView: View {
 
     @ViewBuilder
     private var sideBFields: some View {
-        TextField("Song title", text: $vm.sideB.songTitle)
+        TextField("Song title (required)", text: $vm.sideB.songTitle)
         TextField("Artist", text: $vm.sideB.artist)
             .disabled(vm.matchSideAArtist)
         Toggle("Artist - Match Side A", isOn: $vm.matchSideAArtist)

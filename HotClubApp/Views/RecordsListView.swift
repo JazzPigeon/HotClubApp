@@ -28,10 +28,15 @@ struct RecordsListView: View {
                     }
                 } else {
                     List(records) { record in
-                        RecordSummaryRow(record: record, client: app.client)
-                            .listRowBackground(theme.secondaryBackground)
+                        NavigationLink(value: record) {
+                            RecordSummaryRow(record: record, client: app.client)
+                        }
+                        .listRowBackground(theme.secondaryBackground)
                     }
                 }
+            }
+            .navigationDestination(for: CatalogRecordRow.self) { record in
+                RecordDetailView(record: record, client: app.client)
             }
             .navigationTitle("Records")
             .scrollContentBackground(.hidden)
@@ -62,10 +67,15 @@ struct RecordSummaryRow: View {
     @State private var thumbURL: URL?
 
     private var sideA: RecordSideRow? { record.side(.A) }
+    private var sideB: RecordSideRow? { record.side(.B) }
 
     private var titleText: String {
-        guard let t = sideA?.songTitle, !t.isEmpty else { return "Untitled" }
-        return t
+        let a = sideA?.songTitle?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let b = sideB?.songTitle?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if !a.isEmpty, !b.isEmpty { return "\(a) | \(b)" }
+        if !a.isEmpty { return a }
+        if !b.isEmpty { return b }
+        return "Untitled"
     }
 
     var body: some View {

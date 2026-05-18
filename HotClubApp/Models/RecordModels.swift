@@ -47,7 +47,7 @@ struct RecordSideRow: Decodable, Sendable, Identifiable {
     }
 }
 
-struct CatalogRecordRow: Decodable, Sendable, Identifiable {
+struct CatalogRecordRow: Decodable, Sendable, Identifiable, Hashable {
     let id: UUID
     let createdAt: Date
     let updatedAt: Date
@@ -62,6 +62,14 @@ struct CatalogRecordRow: Decodable, Sendable, Identifiable {
 
     func side(_ code: RecordSideCode) -> RecordSideRow? {
         recordSides.first { $0.side == code }
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+
+    static func == (lhs: CatalogRecordRow, rhs: CatalogRecordRow) -> Bool {
+        lhs.id == rhs.id
     }
 }
 

@@ -21,6 +21,10 @@ final class CreateRecordViewModel {
     var submitError: String?
     var isSubmitting = false
 
+    var canSubmit: Bool {
+        !trimmed(sideA.songTitle).isEmpty && !trimmed(sideB.songTitle).isEmpty
+    }
+
     func reset() {
         sideA = SideFormState()
         sideB = SideFormState()
@@ -67,6 +71,7 @@ final class CreateRecordViewModel {
         defer { isSubmitting = false }
 
         do {
+            try validateRequiredFields()
             let year = try parsedYear(yearText)
 
             let jpegA = try await jpeg(from: sideA.photoItem)
@@ -95,7 +100,7 @@ final class CreateRecordViewModel {
                     RecordSideInsert(
                         recordId: recordId,
                         side: .A,
-                        songTitle: opt(sideA.songTitle),
+                        songTitle: requiredTrimmed(sideA.songTitle),
                         artist: opt(sideA.artist),
                         composer: opt(sideA.composer),
                         label: sharedLabel,
@@ -105,7 +110,7 @@ final class CreateRecordViewModel {
                     RecordSideInsert(
                         recordId: recordId,
                         side: .B,
-                        songTitle: opt(sideB.songTitle),
+                        songTitle: requiredTrimmed(sideB.songTitle),
                         artist: opt(sideBArtistForSubmit),
                         composer: opt(sideBComposerForSubmit),
                         label: sharedLabel,
@@ -126,8 +131,25 @@ final class CreateRecordViewModel {
         }
     }
 
+    private func validateRequiredFields() throws {
+        if trimmed(sideA.songTitle).isEmpty {
+            throw CreateRecordValidationError.missingSongTitle(side: .A)
+        }
+        if trimmed(sideB.songTitle).isEmpty {
+            throw CreateRecordValidationError.missingSongTitle(side: .B)
+        }
+    }
+
+    private func trimmed(_ s: String) -> String {
+        s.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private func requiredTrimmed(_ s: String) -> String {
+        trimmed(s)
+    }
+
     private func opt(_ s: String) -> String? {
-        let t = s.trimmingCharacters(in: .whitespacesAndNewlines)
+        let t = trimmed(s)
         return t.isEmpty ? nil : t
     }
 
@@ -148,10 +170,13 @@ final class CreateRecordViewModel {
 }
 
 enum CreateRecordValidationError: LocalizedError {
+    case missingSongTitle(side: RecordSideCode)
     case invalidYear
 
     var errorDescription: String? {
         switch self {
+        case let .missingSongTitle(side):
+            return "Song title is required for Side \(side.rawValue)."
         case .invalidYear:
             return "Year must be empty or a number between 1800 and 2100."
         }
