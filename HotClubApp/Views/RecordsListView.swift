@@ -36,7 +36,9 @@ struct RecordsListView: View {
                 }
             }
             .navigationDestination(for: CatalogRecordRow.self) { record in
-                RecordDetailView(record: record, client: app.client)
+                RecordDetailView(record: record, client: app.client) {
+                    Task { await load() }
+                }
             }
             .navigationTitle("Records")
             .scrollContentBackground(.hidden)

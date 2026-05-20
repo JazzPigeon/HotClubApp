@@ -17,6 +17,7 @@ create table if not exists public.record_sides (
   record_id uuid not null references public.records (id) on delete cascade,
   side text not null check (side in ('A', 'B')),
   song_title text,
+  personnel text,
   artist text,
   composer text,
   label text,

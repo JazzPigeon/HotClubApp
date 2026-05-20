@@ -28,6 +28,7 @@ struct RecordSideRow: Decodable, Sendable, Identifiable {
     let recordId: UUID
     let side: RecordSideCode
     let songTitle: String?
+    let personnel: String?
     let artist: String?
     let composer: String?
     let label: String?
@@ -39,6 +40,7 @@ struct RecordSideRow: Decodable, Sendable, Identifiable {
         case recordId = "record_id"
         case side
         case songTitle = "song_title"
+        case personnel
         case artist
         case composer
         case label
@@ -77,6 +79,7 @@ struct RecordSideInsert: Encodable, Sendable {
     let recordId: UUID
     let side: RecordSideCode
     let songTitle: String?
+    let personnel: String?
     let artist: String?
     let composer: String?
     let label: String?
@@ -87,6 +90,27 @@ struct RecordSideInsert: Encodable, Sendable {
         case recordId = "record_id"
         case side
         case songTitle = "song_title"
+        case personnel
+        case artist
+        case composer
+        case label
+        case year
+        case imageStoragePath = "image_storage_path"
+    }
+}
+
+struct RecordSideUpdate: Encodable, Sendable {
+    let songTitle: String?
+    let personnel: String?
+    let artist: String?
+    let composer: String?
+    let label: String?
+    let year: Int?
+    let imageStoragePath: String?
+
+    enum CodingKeys: String, CodingKey {
+        case songTitle = "song_title"
+        case personnel
         case artist
         case composer
         case label

@@ -21,4 +21,11 @@ struct StorageService: Sendable {
             .from(Self.bucketId)
             .createSignedURL(path: path, expiresIn: expiresIn)
     }
+
+    func delete(paths: [String]) async throws {
+        guard !paths.isEmpty else { return }
+        try await client.storage
+            .from(Self.bucketId)
+            .remove(paths: paths)
+    }
 }
