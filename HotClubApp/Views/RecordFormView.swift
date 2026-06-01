@@ -5,7 +5,7 @@ struct RecordFormView: View {
     @Environment(\.appTheme) private var theme
     @Bindable var vm: RecordFormViewModel
 
-    var showsPersonnel: Bool = false
+    var showsPersonnel: Bool = true
     var onCancel: () -> Void = {}
     var onSaveSuccess: () -> Void = {}
 
@@ -49,19 +49,21 @@ struct RecordFormView: View {
         .scrollContentBackground(.hidden)
         .background(theme.background)
         .onChange(of: vm.matchSideAArtist) { _, _ in vm.applyMatchSideAArtist() }
+        .onChange(of: vm.matchSideAPersonnel) { _, _ in vm.applyMatchSideAPersonnel() }
         .onChange(of: vm.matchSideAComposer) { _, _ in vm.applyMatchSideAComposer() }
         .onChange(of: vm.sideA.artist) { _, _ in vm.applyMatchSideAArtist() }
+        .onChange(of: vm.sideA.personnel) { _, _ in vm.applyMatchSideAPersonnel() }
         .onChange(of: vm.sideA.composer) { _, _ in vm.applyMatchSideAComposer() }
     }
 
     @ViewBuilder
     private func sideFields(side: Binding<SideFormState>, showsPersonnel: Bool) -> some View {
         TextField("Song title (required)", text: side.songTitle)
+        TextField("Artist", text: side.artist)
         if showsPersonnel {
             TextField("Personnel", text: side.personnel, axis: .vertical)
                 .lineLimit(3 ... 8)
         }
-        TextField("Artist", text: side.artist)
         TextField("Composer", text: side.composer)
         SideImageField(croppedPhotoJPEG: side.croppedPhotoJPEG)
     }
@@ -69,13 +71,15 @@ struct RecordFormView: View {
     @ViewBuilder
     private var sideBFields: some View {
         TextField("Song title (required)", text: $vm.sideB.songTitle)
-        if showsPersonnel {
-            TextField("Personnel", text: $vm.sideB.personnel, axis: .vertical)
-                .lineLimit(3 ... 8)
-        }
         TextField("Artist", text: $vm.sideB.artist)
             .disabled(vm.matchSideAArtist)
         Toggle("Artist - Match Side A", isOn: $vm.matchSideAArtist)
+        if showsPersonnel {
+            TextField("Personnel", text: $vm.sideB.personnel, axis: .vertical)
+                .lineLimit(3 ... 8)
+                .disabled(vm.matchSideAPersonnel)
+            Toggle("Personnel - Match Side A", isOn: $vm.matchSideAPersonnel)
+        }
         TextField("Composer", text: $vm.sideB.composer)
             .disabled(vm.matchSideAComposer)
         Toggle("Composer - Match Side A", isOn: $vm.matchSideAComposer)

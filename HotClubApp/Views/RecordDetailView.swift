@@ -168,10 +168,8 @@ struct RecordDetailView: View {
     private func metadataSection(row: RecordSideRow?) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             detailRow(label: "Song Title", value: row?.songTitle)
-            if let personnel = row?.personnel, !personnel.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                personnelDetailRow(value: personnel)
-            }
             detailRow(label: "Artist", value: row?.artist)
+            personnelDetailRow(value: row?.personnel)
             detailRow(label: "Composer", value: row?.composer)
             detailRow(label: "Label", value: row?.label)
             detailRow(label: "Year", value: row?.year.map(String.init))
@@ -180,12 +178,13 @@ struct RecordDetailView: View {
     }
 
     @ViewBuilder
-    private func personnelDetailRow(value: String) -> some View {
+    private func personnelDetailRow(value: String?) -> some View {
+        let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         VStack(alignment: .leading, spacing: 4) {
             Text("Personnel")
                 .font(.caption)
                 .foregroundStyle(theme.secondaryText)
-            Text(formattedPersonnel(value))
+            Text(trimmed.isEmpty ? "—" : formattedPersonnel(trimmed))
                 .font(.body)
                 .foregroundStyle(theme.primaryText)
                 .multilineTextAlignment(.leading)

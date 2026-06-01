@@ -4,8 +4,8 @@ import SwiftUI
 
 struct SideFormState {
     var songTitle = ""
-    var personnel = ""
     var artist = ""
+    var personnel = ""
     var composer = ""
     var croppedPhotoJPEG: Data?
 }
@@ -23,6 +23,7 @@ final class RecordFormViewModel {
     var label = ""
     var yearText = ""
     var matchSideAArtist = true
+    var matchSideAPersonnel = true
     var matchSideAComposer = true
     var existingImagePathA: String?
     var existingImagePathB: String?
@@ -53,6 +54,7 @@ final class RecordFormViewModel {
         label = ""
         yearText = ""
         matchSideAArtist = true
+        matchSideAPersonnel = true
         matchSideAComposer = true
         existingImagePathA = nil
         existingImagePathB = nil
@@ -70,10 +72,12 @@ final class RecordFormViewModel {
         existingImagePathA = rowA.imageStoragePath
         existingImagePathB = rowB.imageStoragePath
         matchSideAArtist = trimmed(rowB.artist ?? "") == trimmed(rowA.artist ?? "")
+        matchSideAPersonnel = trimmed(rowB.personnel ?? "") == trimmed(rowA.personnel ?? "")
         matchSideAComposer = trimmed(rowB.composer ?? "") == trimmed(rowA.composer ?? "")
         submitError = nil
         isSubmitting = false
         applyMatchSideAArtist()
+        applyMatchSideAPersonnel()
         applyMatchSideAComposer()
     }
 
@@ -83,6 +87,12 @@ final class RecordFormViewModel {
         }
     }
 
+    func applyMatchSideAPersonnel() {
+        if matchSideAPersonnel {
+            sideB.personnel = sideA.personnel
+        }
+    }
+    
     func applyMatchSideAComposer() {
         if matchSideAComposer {
             sideB.composer = sideA.composer
@@ -95,6 +105,10 @@ final class RecordFormViewModel {
 
     private var sideBComposerForSubmit: String {
         matchSideAComposer ? sideA.composer : sideB.composer
+    }
+
+    private var sideBPersonnelForSubmit: String {
+        matchSideAPersonnel ? sideA.personnel : sideB.personnel
     }
 
     func submit(app: AppModel) async -> Bool {
@@ -151,8 +165,8 @@ final class RecordFormViewModel {
                         recordId: recordId,
                         side: .A,
                         songTitle: requiredTrimmed(sideA.songTitle),
-                        personnel: opt(sideA.personnel),
                         artist: opt(sideA.artist),
+                        personnel: opt(sideA.personnel),
                         composer: opt(sideA.composer),
                         label: sharedLabel,
                         year: year,
@@ -162,8 +176,8 @@ final class RecordFormViewModel {
                         recordId: recordId,
                         side: .B,
                         songTitle: requiredTrimmed(sideB.songTitle),
-                        personnel: opt(sideB.personnel),
                         artist: opt(sideBArtistForSubmit),
+                        personnel: opt(sideBPersonnelForSubmit),
                         composer: opt(sideBComposerForSubmit),
                         label: sharedLabel,
                         year: year,
@@ -228,8 +242,8 @@ final class RecordFormViewModel {
             let sharedLabel = opt(label)
             let updateA = RecordSideUpdate(
                 songTitle: requiredTrimmed(sideA.songTitle),
-                personnel: opt(sideA.personnel),
                 artist: opt(sideA.artist),
+                personnel: opt(sideA.personnel),
                 composer: opt(sideA.composer),
                 label: sharedLabel,
                 year: year,
@@ -237,8 +251,8 @@ final class RecordFormViewModel {
             )
             let updateB = RecordSideUpdate(
                 songTitle: requiredTrimmed(sideB.songTitle),
-                personnel: opt(sideB.personnel),
                 artist: opt(sideBArtistForSubmit),
+                personnel: opt(sideBPersonnelForSubmit),
                 composer: opt(sideBComposerForSubmit),
                 label: sharedLabel,
                 year: year,
@@ -257,8 +271,8 @@ final class RecordFormViewModel {
     private func sideFormState(from row: RecordSideRow) -> SideFormState {
         SideFormState(
             songTitle: row.songTitle ?? "",
-            personnel: row.personnel ?? "",
             artist: row.artist ?? "",
+            personnel: row.personnel ?? "",
             composer: row.composer ?? ""
         )
     }

@@ -33,6 +33,7 @@ struct CreateRecordView: View {
                 vm.resetForCreate()
                 vm.applyMatchSideAArtist()
                 vm.applyMatchSideAComposer()
+                vm.applyMatchSideAPersonnel()
             }
         }
     }
