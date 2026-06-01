@@ -98,7 +98,7 @@ struct RecordSummaryRow: View {
     }
 
     private var subtitle: String {
-        let parts = [sideA?.label, sideA?.year.map(String.init)].compactMap { $0 }
+        let parts = [sideA?.artist, sideA?.year.map(String.init)].compactMap { $0 }
         let s = parts.joined(separator: " · ")
         return s.isEmpty ? "Side A" : s
     }

@@ -1,4 +1,3 @@
-import PhotosUI
 import SwiftUI
 
 struct RecordFormView: View {
@@ -64,9 +63,7 @@ struct RecordFormView: View {
         }
         TextField("Artist", text: side.artist)
         TextField("Composer", text: side.composer)
-        PhotosPicker(selection: side.photoItem, matching: .images, photoLibrary: .shared()) {
-            Label("Side image", systemImage: "photo")
-        }
+        SideImageField(croppedPhotoJPEG: side.croppedPhotoJPEG)
     }
 
     @ViewBuilder
@@ -82,8 +79,6 @@ struct RecordFormView: View {
         TextField("Composer", text: $vm.sideB.composer)
             .disabled(vm.matchSideAComposer)
         Toggle("Composer - Match Side A", isOn: $vm.matchSideAComposer)
-        PhotosPicker(selection: $vm.sideB.photoItem, matching: .images, photoLibrary: .shared()) {
-            Label("Side image", systemImage: "photo")
-        }
+        SideImageField(croppedPhotoJPEG: $vm.sideB.croppedPhotoJPEG)
     }
 }

@@ -1,5 +1,4 @@
 import Auth
-import PhotosUI
 import Supabase
 import SwiftUI
 
@@ -8,7 +7,7 @@ struct SideFormState {
     var personnel = ""
     var artist = ""
     var composer = ""
-    var photoItem: PhotosPickerItem?
+    var croppedPhotoJPEG: Data?
 }
 
 @Observable @MainActor
@@ -125,8 +124,8 @@ final class RecordFormViewModel {
             try validateRequiredFields()
             let year = try parsedYear(yearText)
 
-            let jpegA = try await jpeg(from: sideA.photoItem)
-            let jpegB = try await jpeg(from: sideB.photoItem)
+            let jpegA = sideA.croppedPhotoJPEG
+            let jpegB = sideB.croppedPhotoJPEG
 
             let recordService = RecordService(client: client)
             let storage = StorageService(client: client)
@@ -207,8 +206,8 @@ final class RecordFormViewModel {
             try validateRequiredFields()
             let year = try parsedYear(yearText)
 
-            let jpegA = try await jpeg(from: sideA.photoItem)
-            let jpegB = try await jpeg(from: sideB.photoItem)
+            let jpegA = sideA.croppedPhotoJPEG
+            let jpegB = sideB.croppedPhotoJPEG
 
             let recordService = RecordService(client: client)
             let storage = StorageService(client: client)
@@ -297,12 +296,6 @@ final class RecordFormViewModel {
             throw RecordFormValidationError.invalidYear
         }
         return y
-    }
-
-    private func jpeg(from item: PhotosPickerItem?) async throws -> Data? {
-        guard let item else { return nil }
-        guard let raw = try await item.loadTransferable(type: Data.self) else { return nil }
-        return try ImageProcessor.jpegDataResized(raw)
     }
 }
 
