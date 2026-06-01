@@ -1,0 +1,323 @@
+import Auth
+import PhotosUI
+import Supabase
+import SwiftUI
+
+struct SideFormState {
+    var songTitle = ""
+    var personnel = ""
+    var artist = ""
+    var composer = ""
+    var photoItem: PhotosPickerItem?
+}
+
+@Observable @MainActor
+final class RecordFormViewModel {
+    enum Mode {
+        case create
+        case edit(recordId: UUID, sideAId: UUID, sideBId: UUID)
+    }
+
+    var mode: Mode = .create
+    var sideA = SideFormState()
+    var sideB = SideFormState()
+    var label = ""
+    var yearText = ""
+    var matchSideAArtist = true
+    var matchSideAComposer = true
+    var existingImagePathA: String?
+    var existingImagePathB: String?
+    var submitError: String?
+    var isSubmitting = false
+
+    var isEditing: Bool {
+        if case .edit = mode { return true }
+        return false
+    }
+
+    var canSubmit: Bool {
+        !trimmed(sideA.songTitle).isEmpty && !trimmed(sideB.songTitle).isEmpty
+    }
+
+    var navigationTitle: String {
+        isEditing ? "Edit record" : "New record"
+    }
+
+    var saveButtonTitle: String {
+        isEditing ? "Save changes" : "Save record"
+    }
+
+    func resetForCreate() {
+        mode = .create
+        sideA = SideFormState()
+        sideB = SideFormState()
+        label = ""
+        yearText = ""
+        matchSideAArtist = true
+        matchSideAComposer = true
+        existingImagePathA = nil
+        existingImagePathB = nil
+        submitError = nil
+        isSubmitting = false
+    }
+
+    func loadForEdit(_ record: CatalogRecordRow) {
+        guard let rowA = record.side(.A), let rowB = record.side(.B) else { return }
+        mode = .edit(recordId: record.id, sideAId: rowA.id, sideBId: rowB.id)
+        sideA = sideFormState(from: rowA)
+        sideB = sideFormState(from: rowB)
+        label = rowA.label ?? rowB.label ?? ""
+        yearText = rowA.year.map(String.init) ?? rowB.year.map(String.init) ?? ""
+        existingImagePathA = rowA.imageStoragePath
+        existingImagePathB = rowB.imageStoragePath
+        matchSideAArtist = trimmed(rowB.artist ?? "") == trimmed(rowA.artist ?? "")
+        matchSideAComposer = trimmed(rowB.composer ?? "") == trimmed(rowA.composer ?? "")
+        submitError = nil
+        isSubmitting = false
+        applyMatchSideAArtist()
+        applyMatchSideAComposer()
+    }
+
+    func applyMatchSideAArtist() {
+        if matchSideAArtist {
+            sideB.artist = sideA.artist
+        }
+    }
+
+    func applyMatchSideAComposer() {
+        if matchSideAComposer {
+            sideB.composer = sideA.composer
+        }
+    }
+
+    private var sideBArtistForSubmit: String {
+        matchSideAArtist ? sideA.artist : sideB.artist
+    }
+
+    private var sideBComposerForSubmit: String {
+        matchSideAComposer ? sideA.composer : sideB.composer
+    }
+
+    func submit(app: AppModel) async -> Bool {
+        switch mode {
+        case .create:
+            return await submitCreate(app: app)
+        case let .edit(recordId, sideAId, sideBId):
+            return await submitUpdate(app: app, recordId: recordId, sideAId: sideAId, sideBId: sideBId)
+        }
+    }
+
+    private func submitCreate(app: AppModel) async -> Bool {
+        guard let client = app.client else {
+            submitError = AppModelError.noClient.localizedDescription
+            return false
+        }
+        guard app.session != nil else {
+            submitError = "Not signed in."
+            return false
+        }
+
+        submitError = nil
+        isSubmitting = true
+        defer { isSubmitting = false }
+
+        do {
+            try validateRequiredFields()
+            let year = try parsedYear(yearText)
+
+            let jpegA = try await jpeg(from: sideA.photoItem)
+            let jpegB = try await jpeg(from: sideB.photoItem)
+
+            let recordService = RecordService(client: client)
+            let storage = StorageService(client: client)
+            let userId = app.session!.user.id
+            let recordId = try await recordService.insertRecord()
+
+            var pathA: String?
+            var pathB: String?
+
+            do {
+                if let jpegA {
+                    pathA = imagePath(userId: userId, recordId: recordId, side: .A)
+                    try await storage.uploadJPEG(path: pathA!, data: jpegA)
+                }
+                if let jpegB {
+                    pathB = imagePath(userId: userId, recordId: recordId, side: .B)
+                    try await storage.uploadJPEG(path: pathB!, data: jpegB)
+                }
+
+                let sharedLabel = opt(label)
+                let inserts = [
+                    RecordSideInsert(
+                        recordId: recordId,
+                        side: .A,
+                        songTitle: requiredTrimmed(sideA.songTitle),
+                        personnel: opt(sideA.personnel),
+                        artist: opt(sideA.artist),
+                        composer: opt(sideA.composer),
+                        label: sharedLabel,
+                        year: year,
+                        imageStoragePath: pathA
+                    ),
+                    RecordSideInsert(
+                        recordId: recordId,
+                        side: .B,
+                        songTitle: requiredTrimmed(sideB.songTitle),
+                        personnel: opt(sideB.personnel),
+                        artist: opt(sideBArtistForSubmit),
+                        composer: opt(sideBComposerForSubmit),
+                        label: sharedLabel,
+                        year: year,
+                        imageStoragePath: pathB
+                    ),
+                ]
+                try await recordService.insertSides(inserts)
+                resetForCreate()
+                return true
+            } catch {
+                try? await recordService.deleteRecord(id: recordId)
+                throw error
+            }
+        } catch {
+            submitError = error.localizedDescription
+            return false
+        }
+    }
+
+    private func submitUpdate(
+        app: AppModel,
+        recordId: UUID,
+        sideAId: UUID,
+        sideBId: UUID
+    ) async -> Bool {
+        guard let client = app.client else {
+            submitError = AppModelError.noClient.localizedDescription
+            return false
+        }
+        guard let session = app.session else {
+            submitError = "Not signed in."
+            return false
+        }
+
+        submitError = nil
+        isSubmitting = true
+        defer { isSubmitting = false }
+
+        do {
+            try validateRequiredFields()
+            let year = try parsedYear(yearText)
+
+            let jpegA = try await jpeg(from: sideA.photoItem)
+            let jpegB = try await jpeg(from: sideB.photoItem)
+
+            let recordService = RecordService(client: client)
+            let storage = StorageService(client: client)
+            let userId = session.user.id
+
+            var pathA = existingImagePathA
+            var pathB = existingImagePathB
+
+            if let jpegA {
+                pathA = imagePath(userId: userId, recordId: recordId, side: .A)
+                try await storage.uploadJPEG(path: pathA!, data: jpegA)
+            }
+            if let jpegB {
+                pathB = imagePath(userId: userId, recordId: recordId, side: .B)
+                try await storage.uploadJPEG(path: pathB!, data: jpegB)
+            }
+
+            let sharedLabel = opt(label)
+            let updateA = RecordSideUpdate(
+                songTitle: requiredTrimmed(sideA.songTitle),
+                personnel: opt(sideA.personnel),
+                artist: opt(sideA.artist),
+                composer: opt(sideA.composer),
+                label: sharedLabel,
+                year: year,
+                imageStoragePath: pathA
+            )
+            let updateB = RecordSideUpdate(
+                songTitle: requiredTrimmed(sideB.songTitle),
+                personnel: opt(sideB.personnel),
+                artist: opt(sideBArtistForSubmit),
+                composer: opt(sideBComposerForSubmit),
+                label: sharedLabel,
+                year: year,
+                imageStoragePath: pathB
+            )
+
+            try await recordService.updateSide(id: sideAId, update: updateA)
+            try await recordService.updateSide(id: sideBId, update: updateB)
+            return true
+        } catch {
+            submitError = error.localizedDescription
+            return false
+        }
+    }
+
+    private func sideFormState(from row: RecordSideRow) -> SideFormState {
+        SideFormState(
+            songTitle: row.songTitle ?? "",
+            personnel: row.personnel ?? "",
+            artist: row.artist ?? "",
+            composer: row.composer ?? ""
+        )
+    }
+
+    private func imagePath(userId: UUID, recordId: UUID, side: RecordSideCode) -> String {
+        "\(userId.uuidString.lowercased())/\(recordId.uuidString.lowercased())/\(side.rawValue).jpg"
+    }
+
+    private func validateRequiredFields() throws {
+        if trimmed(sideA.songTitle).isEmpty {
+            throw RecordFormValidationError.missingSongTitle(side: .A)
+        }
+        if trimmed(sideB.songTitle).isEmpty {
+            throw RecordFormValidationError.missingSongTitle(side: .B)
+        }
+    }
+
+    private func trimmed(_ s: String) -> String {
+        s.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private func requiredTrimmed(_ s: String) -> String {
+        trimmed(s)
+    }
+
+    private func opt(_ s: String) -> String? {
+        let t = trimmed(s)
+        return t.isEmpty ? nil : t
+    }
+
+    private func parsedYear(_ text: String) throws -> Int? {
+        let t = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        if t.isEmpty { return nil }
+        guard let y = Int(t), (1800 ... 2100).contains(y) else {
+            throw RecordFormValidationError.invalidYear
+        }
+        return y
+    }
+
+    private func jpeg(from item: PhotosPickerItem?) async throws -> Data? {
+        guard let item else { return nil }
+        guard let raw = try await item.loadTransferable(type: Data.self) else { return nil }
+        return try ImageProcessor.jpegDataResized(raw)
+    }
+}
+
+enum RecordFormValidationError: LocalizedError {
+    case missingSongTitle(side: RecordSideCode)
+    case invalidYear
+
+    var errorDescription: String? {
+        switch self {
+        case let .missingSongTitle(side):
+            return "Song title is required for Side \(side.rawValue)."
+        case .invalidYear:
+            return "Year must be empty or a number between 1800 and 2100."
+        }
+    }
+}
+
+typealias CreateRecordValidationError = RecordFormValidationError
