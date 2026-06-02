@@ -15,33 +15,51 @@ final class AppModel {
 
     func bootstrap() async {
         isBootstrapping = true
-        defer { isBootstrapping = false }
 
         do {
             let secrets = try AppSecrets.load()
             secretsError = nil
-            let client = SupabaseClient(supabaseURL: secrets.url, supabaseKey: secrets.anonKey)
+            let client = SupabaseClient(
+                supabaseURL: secrets.url,
+                supabaseKey: secrets.anonKey,
+                options: .init(auth: .init(emitLocalSessionAsInitialSession: true))
+            )
             self.client = client
-            session = try? await client.auth.session
-            observeAuth(client: client)
+
+            for await change in await client.auth.authStateChanges {
+                applyAuthChange(event: change.event, session: change.session)
+            }
         } catch let error as LocalizedError {
+            isBootstrapping = false
             secretsError = error.errorDescription ?? String(describing: error)
             client = nil
             session = nil
         } catch {
+            isBootstrapping = false
             secretsError = error.localizedDescription
             client = nil
             session = nil
         }
     }
 
-    private func observeAuth(client: SupabaseClient) {
-        Task {
-            for await change in await client.auth.authStateChanges {
-                await MainActor.run {
-                    session = change.session
-                }
+    private func applyAuthChange(event: AuthChangeEvent, session: Session?) {
+        switch event {
+        case .initialSession:
+            if let session, !session.isExpired {
+                self.session = session
+                isBootstrapping = false
+            } else if session == nil {
+                self.session = nil
+                isBootstrapping = false
             }
+        case .tokenRefreshed, .signedIn, .userUpdated:
+            self.session = session
+            isBootstrapping = false
+        case .signedOut:
+            self.session = nil
+            isBootstrapping = false
+        default:
+            self.session = session
         }
     }
 

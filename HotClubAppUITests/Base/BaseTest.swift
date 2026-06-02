@@ -1,0 +1,47 @@
+//
+//  BaseTest.swift
+//  HotClubApp
+//
+//  Created by Cindy Michalowski on 6/2/26.
+//
+
+import XCTest
+
+class BaseTest: XCTestCase {
+    
+    let app = XCUIApplication()
+    
+    // if test fails, this flag is false and application exit is handled by TearDown()
+    var testRanToCompletion: Bool = false
+    
+    // Set Up
+    override func setUp() {
+        
+        // use to track whether test ran to completion; saves time during tear down in cases where test fails
+        testRanToCompletion = false
+                
+        // if an assertion fails in the course of running a test, test will stop
+        continueAfterFailure = false
+        
+        // launch the app under test
+        app.launch()
+    }
+    
+    // Tear Down
+    override func tearDown() {
+        // if test fails, capture screenshot at point of failure; delete tearDown screenshot if test passes
+        let screenshot = XCUIScreen.main.screenshot()
+        let fullScreenshotAttachment = XCTAttachment(screenshot: screenshot)
+        fullScreenshotAttachment.lifetime = .deleteOnSuccess
+        add(fullScreenshotAttachment)
+                
+        // in the event of a test failure, app needs to be exited gracefully to prevent all other tests from failing
+//        if testRanToCompletion == false {
+//
+//        }
+        
+        // terminate app
+        app.terminate()
+    }
+    
+}
