@@ -56,7 +56,13 @@ struct LoginView: View {
                     .pickerStyle(.segmented)
                 }
             }
-            .navigationTitle("78 rpm catalog")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("78 rmp catalog")
+                        .accessibilityIdentifier("App title")
+                }
+            }
             .scrollContentBackground(.hidden)
             .background(theme.background)
         }

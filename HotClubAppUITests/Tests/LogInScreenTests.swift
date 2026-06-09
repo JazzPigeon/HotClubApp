@@ -14,4 +14,9 @@ class LogInScreenTests: BaseTest {
         LogInScreen()
             .assertSignInButtonIsDisabled()
     }
+
+    func test_thisTestShouldFail() throws {
+        LogInScreen()
+            .assertPageTitleIsDisplayedAsExpected()
+    }
 }
