@@ -62,3 +62,11 @@ jobs:
           echo "## UI Test Results" >> $GITHUB_STEP_SUMMARY
           echo "- ✅ Passed: $PASSED" >> $GITHUB_STEP_SUMMARY
           echo "- ❌ Failed: $FAILED" >> $GITHUB_STEP_SUMMARY
+          if [ "$FAILED" != "0" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Failed Tests" >> $GITHUB_STEP_SUMMARY
+            echo "$RESULT_JSON" | jq -r '
+              (.testFailures // empty | if type == "array" then .[] else . end) |
+              "- **\(.testIdentifierString // "\(.targetName)/\(.testName)")**\n  - \(.failureText | gsub("\n"; " "))"
+            ' >> $GITHUB_STEP_SUMMARY
+          fi
