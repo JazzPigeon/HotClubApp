@@ -52,3 +52,13 @@ jobs:
           name: ui-test-results
           path: TestResults.xcresult
           if-no-files-found: ignore
+
+      - name: Create Test Summary
+        if: always()
+        run: |
+          RESULT_JSON=$(xcrun xcresulttool get test-results summary --path TestResults.xcresult)
+          PASSED=$(echo "$RESULT_JSON" | jq -r '.passedTests // 0')
+          FAILED=$(echo "$RESULT_JSON" | jq -r '.failedTests // 0')
+          echo "## UI Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Passed: $PASSED" >> $GITHUB_STEP_SUMMARY
+          echo "- ❌ Failed: $FAILED" >> $GITHUB_STEP_SUMMARY

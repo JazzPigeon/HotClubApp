@@ -28,7 +28,7 @@ class LogInScreen: BaseScreen {
     // MARK: Assertions
     @discardableResult
     func assertPageTitleIsDisplayedAsExpected() -> LogInScreen {
-        XCTAssertEqual(txtTitle.value as! String, "78 rpm catalog", "App title is displayed as '78rpm catalog'")
+        XCTAssertEqual(txtTitle.value as! String, "78 rpm catalog", "App title is displayed as '78 rpm catalog'")
         return self
     }
 
