@@ -70,3 +70,30 @@ jobs:
               "- **\(.testIdentifierString // "\(.targetName)/\(.testName)")**\n  - \(.failureText | gsub("\n"; " "))"
             ' >> $GITHUB_STEP_SUMMARY
           fi
+
+      - name: Set up Node.js
+        if: always()
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install Allure
+        if: always()
+        run: npm ci
+
+      - name: Generate Allure report
+        if: always()
+        run: |
+          if [ -d TestResults.xcresult ]; then
+            npx allure generate TestResults.xcresult
+          else
+            echo "No TestResults.xcresult found; skipping Allure report."
+          fi
+          
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: allure-report
+          path: allure-report/
+          if-no-files-found: ignore
