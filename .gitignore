@@ -5,6 +5,12 @@
 ## User settings
 xcuserdata/
 
+# Xcode Derived Data
+DerivedData/
+build/
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+
 ## Obj-C/Swift specific
 *.hmap
 
