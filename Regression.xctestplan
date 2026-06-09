@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "87AE2BD5-450B-478B-AC84-29A85935E51A",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:HotClubApp.xcodeproj",
+        "identifier" : "960453462E9D7B9B005B15AE",
+        "name" : "HotClubAppUITests"
+      }
+    }
+  ],
+  "version" : 1
+}

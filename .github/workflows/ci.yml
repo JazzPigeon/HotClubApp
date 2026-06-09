@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  ui-tests:
+    name: UI Tests (Regression test plan)
+    runs-on: macos-26
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Create Secrets.plist for CI
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::Add SUPABASE_URL and SUPABASE_ANON_KEY repository secrets for CI."
+            exit 1
+          fi
+          /usr/libexec/PlistBuddy -c "Add :SUPABASE_URL string '$SUPABASE_URL'" HotClubApp/Secrets.plist
+          /usr/libexec/PlistBuddy -c "Add :SUPABASE_ANON_KEY string '$SUPABASE_ANON_KEY'" HotClubApp/Secrets.plist
+
+      - name: Run Regression test plan
+        run: |
+          set -o pipefail
+          xcodebuild test \
+            -project HotClubApp.xcodeproj \
+            -scheme HotClubApp \
+            -testPlan Regression \
+            -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest' \
+            -derivedDataPath DerivedData \
+            -resultBundlePath TestResults.xcresult
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-test-results
+          path: TestResults.xcresult
+          if-no-files-found: ignore
