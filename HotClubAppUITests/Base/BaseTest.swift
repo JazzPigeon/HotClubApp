@@ -23,6 +23,15 @@ class BaseTest: XCTestCase {
         // if an assertion fails in the course of running a test, test will stop
         continueAfterFailure = false
         
+        app.launchArguments += [
+            "-disableAnimations",
+            "-skipOnboarding"
+        ]
+        
+// MARK: Suggested by ChatGPT
+//        app.launchEnvironment["API_ENV"] = "staging"
+//        app.launchEnvironment["UITEST_MODE"] = "true"
+        
         // launch the app under test
         app.launch()
     }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		96724D202FD83EC000A27FEF /* Regression.xctestplan in Resources */ = {isa = PBXBuildFile; fileRef = 96724D1F2FD83EC000A27FEF /* Regression.xctestplan */; };
 		A7F3C8A12E9D7B99005B15E1 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = A7F3C8A02E9D7B99005B15E1 /* Supabase */; };
 /* End PBXBuildFile section */
 
@@ -31,6 +32,7 @@
 		9604532B2E9D7B99005B15AE /* HotClubApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HotClubApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9604533D2E9D7B9B005B15AE /* HotClubAppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HotClubAppTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		960453472E9D7B9B005B15AE /* HotClubAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HotClubAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		96724D1F2FD83EC000A27FEF /* Regression.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = Regression.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -80,6 +82,7 @@
 		960453222E9D7B99005B15AE = {
 			isa = PBXGroup;
 			children = (
+				96724D1F2FD83EC000A27FEF /* Regression.xctestplan */,
 				9604532D2E9D7B99005B15AE /* HotClubApp */,
 				960453402E9D7B9B005B15AE /* HotClubAppTests */,
 				9604534A2E9D7B9B005B15AE /* HotClubAppUITests */,
@@ -221,6 +224,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96724D202FD83EC000A27FEF /* Regression.xctestplan in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
