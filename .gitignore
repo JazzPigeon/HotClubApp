@@ -4,6 +4,7 @@
 
 ## User settings
 xcuserdata/
+userdata/
 
 # Xcode Derived Data
 DerivedData/
@@ -74,3 +75,7 @@ fastlane/test_output
 allure-report/
 TestResults.xcresult/
 node_modules/
+
+# DS_Store
+# Hidden file created by Mac OS to save folder display configurations
+.DS_Store
