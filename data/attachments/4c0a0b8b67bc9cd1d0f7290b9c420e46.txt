@@ -1,4 +1,0 @@
-Query chain:
- →Find: Target Application 'tech.cindymichalowski.HotClubApp.HotClubApp'
-  ↪︎Find: Descendants matching type NavigationBar
-    ↪︎Find: Elements matching predicate '"78 rpm catalog" IN identifiers'
