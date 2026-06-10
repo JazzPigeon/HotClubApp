@@ -12,3 +12,7 @@ struct LoginScreenStrings {
     let signIn = "Sign in"
     let signUp = "Sign up"
 }
+
+struct SettingsMenuStrings {
+    let signOut = "Sign out"
+}
