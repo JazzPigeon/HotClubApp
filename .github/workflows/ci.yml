@@ -5,6 +5,13 @@ on:
     branches:
       - '**'
 
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
@@ -52,3 +59,103 @@ jobs:
           name: ui-test-results
           path: TestResults.xcresult
           if-no-files-found: ignore
+
+      - name: Create Test Summary
+        if: always()
+        run: |
+          RESULT_JSON=$(xcrun xcresulttool get test-results summary --path TestResults.xcresult)
+          PASSED=$(echo "$RESULT_JSON" | jq -r '.passedTests // 0')
+          FAILED=$(echo "$RESULT_JSON" | jq -r '.failedTests // 0')
+          echo "## UI Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "- ✅ Passed: $PASSED" >> $GITHUB_STEP_SUMMARY
+          echo "- ❌ Failed: $FAILED" >> $GITHUB_STEP_SUMMARY
+          if [ "$FAILED" != "0" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Failed Tests" >> $GITHUB_STEP_SUMMARY
+            echo "$RESULT_JSON" | jq -r '
+              (.testFailures // empty | if type == "array" then .[] else . end) |
+              "- **\(.testIdentifierString // "\(.targetName)/\(.testName)")**\n  - \(.failureText | gsub("\n"; " "))"
+            ' >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Set up Node.js
+        if: always()
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Install Allure
+        if: always()
+        run: npm ci
+
+      - name: Load previous Allure history
+        if: always()
+        continue-on-error: true
+        uses: actions/checkout@v5
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Generate Allure report
+        if: always()
+        run: |
+          if [ -d TestResults.xcresult ]; then
+            mkdir -p allure-report
+            if [ -d gh-pages/history ]; then
+              cp -R gh-pages/history allure-report/history
+            fi
+            npx allure generate TestResults.xcresult --history-limit 30
+          else
+            echo "No TestResults.xcresult found; skipping Allure report."
+          fi
+
+      - name: Add Allure report link to summary
+        if: always() && github.ref == 'refs/heads/main'
+        run: |
+          if [ -f allure-report/index.html ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Allure Report" >> $GITHUB_STEP_SUMMARY
+            echo "Published to GitHub Pages after this workflow completes." >> $GITHUB_STEP_SUMMARY
+            echo "- [Open latest report](https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/)" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: allure-report
+          path: allure-report/
+          if-no-files-found: ignore
+
+  deploy-allure-report:
+    name: Deploy Allure report to GitHub Pages
+    needs: ui-tests
+    if: github.ref == 'refs/heads/main' && needs.ui-tests.result != 'cancelled'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download Allure report
+        uses: actions/download-artifact@v6
+        with:
+          name: allure-report
+          path: allure-report
+
+      - name: Verify Allure report exists
+        id: report
+        run: |
+          if [ -f allure-report/index.html ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "No Allure report found; skipping GitHub Pages deployment."
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Deploy to GitHub Pages
+        if: steps.report.outputs.exists == 'true'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-report

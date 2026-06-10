@@ -6,9 +6,9 @@
 //
 
 struct LoginScreenStrings {
+    let title = "App title"
     let email = "Email"
     let password = "Password"
     let signIn = "Sign in"
     let signUp = "Sign up"
-    let appTitle = "78 rmp catalog"
 }

@@ -1,0 +1,7 @@
+{
+  "name": "hotclubapp",
+  "private": true,
+  "devDependencies": {
+    "allure": "^3.10.0"
+  }
+}

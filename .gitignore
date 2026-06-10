@@ -69,3 +69,8 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+
+# Allure 3 / Test Results
+allure-report/
+TestResults.xcresult/
+node_modules/
