@@ -59,7 +59,7 @@ struct LoginView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text("78 rmp catalog")
+                    Text("78 rpm catalog")
                         .accessibilityIdentifier("App title")
                 }
             }

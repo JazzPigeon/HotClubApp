@@ -18,11 +18,9 @@ final class HotClubAppUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
 
-        let setup = app.navigationBars["Setup"].waitForExistence(timeout: 8)
-        let auth = app.navigationBars["78 rpm catalog"].waitForExistence(timeout: 8)
-        let tabs = app.tabBars.firstMatch.waitForExistence(timeout: 8)
-
-        print("Wait here")
+        let setup = app.navigationBars["Setup"].waitForExistence(timeout: 3)
+        let auth = app.staticTexts["78 rpm catalog"].waitForExistence(timeout: 3)
+        let tabs = app.tabBars.firstMatch.waitForExistence(timeout: 3)
         
         XCTAssertTrue(
             setup || auth || tabs,
