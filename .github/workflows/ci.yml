@@ -130,7 +130,7 @@ jobs:
   deploy-allure-report:
     name: Deploy Allure report to GitHub Pages
     needs: ui-tests
-    if: github.ref == 'refs/heads/main' && needs.ui-tests.result != 'cancelled'
+    if: always() && github.ref == 'refs/heads/main' && needs.ui-tests.result != 'cancelled'
     runs-on: ubuntu-latest
     permissions:
       contents: write
