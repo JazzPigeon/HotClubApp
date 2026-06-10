@@ -1,1 +1,1 @@
-{"id":"a54125e2b5e63453f1c1d4d82a8d245b","fullName":"test://com.apple.xcode/HotClubApp/HotClubAppUITests/HotClubAppUITests/testLaunchPerformance","name":"testLaunchPerformance()","status":"passed","testResultsByEnv":{"default":"08d0511f574f494f43284c4071825a93"}}
+{"id":"a54125e2b5e63453f1c1d4d82a8d245b","fullName":"test://com.apple.xcode/HotClubApp/HotClubAppUITests/HotClubAppUITests/testLaunchPerformance","name":"testLaunchPerformance()","status":"failed","testResultsByEnv":{"default":"f88431e86151137514054e32cd936eba"}}
