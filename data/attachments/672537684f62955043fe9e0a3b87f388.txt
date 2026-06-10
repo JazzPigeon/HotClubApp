@@ -1,0 +1,4 @@
+Query chain:
+ →Find: Target Application 'tech.cindymichalowski.HotClubApp.HotClubApp'
+  ↪︎Find: Descendants matching type TabBar
+    ↪︎Find: First Match
