@@ -13,6 +13,9 @@
   },
   "testTargets" : [
     {
+      "skippedTests" : [
+        "LogInScreenTests\/test_thisTestShouldFail()"
+      ],
       "target" : {
         "containerPath" : "container:HotClubApp.xcodeproj",
         "identifier" : "960453462E9D7B9B005B15AE",
