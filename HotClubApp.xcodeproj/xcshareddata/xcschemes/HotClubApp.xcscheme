@@ -33,6 +33,12 @@
             reference = "container:Regression.xctestplan"
             default = "YES">
          </TestPlanReference>
+         <TestPlanReference
+            reference = "container:Smoke.xctestplan">
+         </TestPlanReference>
+         <TestPlanReference
+            reference = "container:Performance.xctestplan">
+         </TestPlanReference>
       </TestPlans>
       <Testables>
          <TestableReference

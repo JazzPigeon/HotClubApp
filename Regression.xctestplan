@@ -14,6 +14,9 @@
   "testTargets" : [
     {
       "skippedTests" : [
+        "BaseTest",
+        "HotClubAppUITestsLaunchTests",
+        "HotClubAppUITestsLaunchTests\/testLaunch()",
         "LogInScreenTests\/test_thisTestShouldFail()"
       ],
       "target" : {

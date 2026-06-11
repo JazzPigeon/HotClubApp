@@ -12,7 +12,19 @@
     "testTimeoutsEnabled" : true
   },
   "testTargets" : [
-
+    {
+      "skippedTests" : [
+        "BaseTest",
+        "HotClubAppUITestsLaunchTests",
+        "HotClubAppUITestsLaunchTests\/testLaunch()",
+        "LogInScreenTests"
+      ],
+      "target" : {
+        "containerPath" : "container:HotClubApp.xcodeproj",
+        "identifier" : "960453462E9D7B9B005B15AE",
+        "name" : "HotClubAppUITests"
+      }
+    }
   ],
   "version" : 1
 }
