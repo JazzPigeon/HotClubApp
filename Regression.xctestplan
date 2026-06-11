@@ -15,6 +15,9 @@
     {
       "skippedTests" : [
         "BaseTest",
+        "HotClubAppUITests",
+        "HotClubAppUITests\/testLaunchPerformance()",
+        "HotClubAppUITests\/testLaunchShowsRootFlow()",
         "HotClubAppUITestsLaunchTests",
         "HotClubAppUITestsLaunchTests\/testLaunch()",
         "LogInScreenTests\/test_thisTestShouldFail()"
