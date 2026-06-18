@@ -1,7 +1,7 @@
 import Foundation
 import Supabase
 
-struct StorageService: Sendable {
+struct StorageService: ImageStore {
     static let bucketId = "record-images"
 
     let client: SupabaseClient

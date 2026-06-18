@@ -1,11 +1,11 @@
-import Supabase
 import SwiftUI
 
 struct RecordDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appTheme) private var theme
 
-    let client: SupabaseClient?
+    let repository: RecordRepository?
+    let imageStore: ImageStore?
     var onRecordChanged: () -> Void = {}
 
     @State private var record: CatalogRecordRow
@@ -19,8 +19,14 @@ struct RecordDetailView: View {
     @State private var isDeleting = false
     @State private var refreshToken = UUID()
 
-    init(record: CatalogRecordRow, client: SupabaseClient?, onRecordChanged: @escaping () -> Void = {}) {
-        self.client = client
+    init(
+        record: CatalogRecordRow,
+        repository: RecordRepository?,
+        imageStore: ImageStore?,
+        onRecordChanged: @escaping () -> Void = {}
+    ) {
+        self.repository = repository
+        self.imageStore = imageStore
         self.onRecordChanged = onRecordChanged
         _record = State(initialValue: record)
     }
@@ -223,21 +229,20 @@ struct RecordDetailView: View {
     private func loadImages() async {
         imageURLA = nil
         imageURLB = nil
-        guard let client else { return }
-        let storage = StorageService(client: client)
+        guard let imageStore else { return }
         if let path = sideA?.imageStoragePath, !path.isEmpty {
-            imageURLA = try? await storage.signedURL(path: path, expiresIn: 3600)
+            imageURLA = try? await imageStore.signedURL(path: path, expiresIn: 3600)
         }
         if let path = sideB?.imageStoragePath, !path.isEmpty {
-            imageURLB = try? await storage.signedURL(path: path, expiresIn: 3600)
+            imageURLB = try? await imageStore.signedURL(path: path, expiresIn: 3600)
         }
     }
 
     @MainActor
     private func reloadRecord() async {
-        guard let client else { return }
+        guard let repository else { return }
         do {
-            let updated = try await RecordService(client: client).fetchCatalogRecord(id: record.id)
+            let updated = try await repository.fetchCatalogRecord(id: record.id)
             record = updated
             showingSideB = false
             flipDegrees = 0
@@ -249,7 +254,7 @@ struct RecordDetailView: View {
     }
 
     private func deleteRecord() async {
-        guard let client else {
+        guard let repository else {
             actionError = AppModelError.noClient.localizedDescription
             return
         }
@@ -261,8 +266,8 @@ struct RecordDetailView: View {
             .filter { !$0.isEmpty }
 
         do {
-            try? await StorageService(client: client).delete(paths: paths)
-            try await RecordService(client: client).deleteRecord(id: record.id)
+            try? await imageStore?.delete(paths: paths)
+            try await repository.deleteRecord(id: record.id)
             onRecordChanged()
             dismiss()
         } catch {

@@ -1,5 +1,3 @@
-import Auth
-import Supabase
 import SwiftUI
 
 struct SideFormState {
@@ -121,11 +119,11 @@ final class RecordFormViewModel {
     }
 
     private func submitCreate(app: AppModel) async -> Bool {
-        guard let client = app.client else {
+        guard let recordService = app.recordRepository, let storage = app.imageStore else {
             submitError = AppModelError.noClient.localizedDescription
             return false
         }
-        guard app.session != nil else {
+        guard let userId = app.currentUserId else {
             submitError = "Not signed in."
             return false
         }
@@ -141,9 +139,6 @@ final class RecordFormViewModel {
             let jpegA = sideA.croppedPhotoJPEG
             let jpegB = sideB.croppedPhotoJPEG
 
-            let recordService = RecordService(client: client)
-            let storage = StorageService(client: client)
-            let userId = app.session!.user.id
             let recordId = try await recordService.insertRecord()
 
             var pathA: String?
@@ -203,11 +198,11 @@ final class RecordFormViewModel {
         sideAId: UUID,
         sideBId: UUID
     ) async -> Bool {
-        guard let client = app.client else {
+        guard let recordService = app.recordRepository, let storage = app.imageStore else {
             submitError = AppModelError.noClient.localizedDescription
             return false
         }
-        guard let session = app.session else {
+        guard let userId = app.currentUserId else {
             submitError = "Not signed in."
             return false
         }
@@ -222,10 +217,6 @@ final class RecordFormViewModel {
 
             let jpegA = sideA.croppedPhotoJPEG
             let jpegB = sideB.croppedPhotoJPEG
-
-            let recordService = RecordService(client: client)
-            let storage = StorageService(client: client)
-            let userId = session.user.id
 
             var pathA = existingImagePathA
             var pathB = existingImagePathB

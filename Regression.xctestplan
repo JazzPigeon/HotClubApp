@@ -9,18 +9,19 @@
     }
   ],
   "defaultOptions" : {
+    "environmentVariableEntries" : [
+      {
+        "key" : "UITEST_MOCK",
+        "value" : "1"
+      }
+    ],
     "testTimeoutsEnabled" : true
   },
   "testTargets" : [
     {
-      "skippedTests" : [
-        "BaseTest",
-        "HotClubAppUITests",
-        "HotClubAppUITests\/testLaunchPerformance()",
-        "HotClubAppUITests\/testLaunchShowsRootFlow()",
-        "HotClubAppUITestsLaunchTests",
-        "HotClubAppUITestsLaunchTests\/testLaunch()",
-        "LogInScreenTests\/test_thisTestShouldFail()"
+      "selectedTests" : [
+        "LogInScreenTests\/test_tapSignInButton()",
+        "RecordsListScreenTests\/test_recordsListShowsSeededRecords()"
       ],
       "target" : {
         "containerPath" : "container:HotClubApp.xcodeproj",

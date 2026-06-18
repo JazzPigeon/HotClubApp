@@ -16,3 +16,8 @@ struct LoginScreenStrings {
 struct SettingsMenuStrings {
     let signOut = "Sign out"
 }
+
+struct RecordsListScreenStrings {
+    let title = "Records"
+    let seededRecordTitle = "In the Mood"
+}

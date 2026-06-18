@@ -1,4 +1,3 @@
-import Supabase
 import SwiftUI
 
 struct RecordsListView: View {
@@ -29,14 +28,14 @@ struct RecordsListView: View {
                 } else {
                     List(records) { record in
                         NavigationLink(value: record) {
-                            RecordSummaryRow(record: record, client: app.client)
+                            RecordSummaryRow(record: record, imageStore: app.imageStore)
                         }
                         .listRowBackground(theme.secondaryBackground)
                     }
                 }
             }
             .navigationDestination(for: CatalogRecordRow.self) { record in
-                RecordDetailView(record: record, client: app.client) {
+                RecordDetailView(record: record, repository: app.recordRepository, imageStore: app.imageStore) {
                     Task { await load() }
                 }
             }
@@ -49,12 +48,12 @@ struct RecordsListView: View {
     }
 
     private func load() async {
-        guard let client = app.client else { return }
+        guard let repository = app.recordRepository else { return }
         isLoading = true
         loadError = nil
         defer { isLoading = false }
         do {
-            records = try await RecordService(client: client).fetchCatalogRecords()
+            records = try await repository.fetchCatalogRecords()
         } catch {
             loadError = error.localizedDescription
         }
@@ -63,7 +62,7 @@ struct RecordsListView: View {
 
 struct RecordSummaryRow: View {
     let record: CatalogRecordRow
-    let client: SupabaseClient?
+    let imageStore: ImageStore?
     @Environment(\.appTheme) private var theme
 
     @State private var thumbURL: URL?
@@ -132,9 +131,9 @@ struct RecordSummaryRow: View {
 
     private func resolveThumb() async {
         thumbURL = nil
-        guard let path = sideA?.imageStoragePath, !path.isEmpty, let client else { return }
+        guard let path = sideA?.imageStoragePath, !path.isEmpty, let imageStore else { return }
         do {
-            thumbURL = try await StorageService(client: client).signedURL(path: path, expiresIn: 3600)
+            thumbURL = try await imageStore.signedURL(path: path, expiresIn: 3600)
         } catch {
             thumbURL = nil
         }
