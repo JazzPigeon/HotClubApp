@@ -1,7 +1,7 @@
 import Foundation
 import Supabase
 
-struct RecordService: Sendable {
+struct RecordService: RecordRepository {
     let client: SupabaseClient
 
     private static let catalogSelect =

@@ -4,10 +4,19 @@ import Supabase
 
 @Observable @MainActor
 final class AppModel {
+    static let mockUserId = UUID(uuidString: "00000000-0000-0000-0000-0000000000FF")!
+
     private(set) var client: SupabaseClient?
     private(set) var session: Session?
     private(set) var secretsError: String?
     private(set) var isBootstrapping = true
+    private(set) var isMockMode = false
+    private(set) var recordRepository: RecordRepository?
+    private(set) var imageStore: ImageStore?
+
+    var isSignedIn: Bool { isMockMode || session != nil }
+
+    var currentUserId: UUID? { isMockMode ? Self.mockUserId : session?.user.id }
 
     init() {
         Task { await bootstrap() }
@@ -15,6 +24,17 @@ final class AppModel {
 
     func bootstrap() async {
         isBootstrapping = true
+
+        if ProcessInfo.processInfo.environment["UITEST_MOCK"] == "1" {
+            isMockMode = true
+            secretsError = nil
+            client = nil
+            session = nil
+            recordRepository = MockRecordRepository()
+            imageStore = MockImageStore()
+            isBootstrapping = false
+            return
+        }
 
         do {
             let secrets = try AppSecrets.load()
@@ -25,6 +45,8 @@ final class AppModel {
                 options: .init(auth: .init(emitLocalSessionAsInitialSession: true))
             )
             self.client = client
+            recordRepository = RecordService(client: client)
+            imageStore = StorageService(client: client)
 
             for await change in await client.auth.authStateChanges {
                 applyAuthChange(event: change.event, session: change.session)
@@ -34,11 +56,15 @@ final class AppModel {
             secretsError = error.errorDescription ?? String(describing: error)
             client = nil
             session = nil
+            recordRepository = nil
+            imageStore = nil
         } catch {
             isBootstrapping = false
             secretsError = error.localizedDescription
             client = nil
             session = nil
+            recordRepository = nil
+            imageStore = nil
         }
     }
 

@@ -14,7 +14,7 @@ struct RootView: View {
                 ProgressView("Loading…")
             } else if app.secretsError != nil {
                 MissingSecretsView(message: app.secretsError ?? "Missing configuration.")
-            } else if app.session == nil {
+            } else if !app.isSignedIn {
                 LoginView()
             } else {
                 MainTabView()

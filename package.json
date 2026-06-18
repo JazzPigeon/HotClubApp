@@ -3,5 +3,8 @@
   "private": true,
   "devDependencies": {
     "allure": "^3.10.0"
+  },
+  "dependencies": {
+    "appium-xcuitest-driver": "^11.11.2"
   }
 }

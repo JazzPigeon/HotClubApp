@@ -27,11 +27,14 @@ class BaseTest: XCTestCase {
             "-disableAnimations",
             "-skipOnboarding"
         ]
-        
-// MARK: Suggested by ChatGPT
-//        app.launchEnvironment["API_ENV"] = "staging"
-//        app.launchEnvironment["UITEST_MODE"] = "true"
-        
+
+        // Forward the mock-data flag from the test plan to the app under test.
+        // Test plan environment variables apply to the test runner, not the app process,
+        // so XCUITest requires forwarding them explicitly via launchEnvironment.
+        if ProcessInfo.processInfo.environment["UITEST_MOCK"] == "1" {
+            app.launchEnvironment["UITEST_MOCK"] = "1"
+        }
+
         // launch the app under test
         app.launch()
     }
