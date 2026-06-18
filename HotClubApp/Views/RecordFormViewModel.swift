@@ -20,6 +20,7 @@ final class RecordFormViewModel {
     var sideB = SideFormState()
     var label = ""
     var yearText = ""
+    var keywords = ""
     var matchSideAArtist = true
     var matchSideAPersonnel = true
     var matchSideAComposer = true
@@ -51,6 +52,7 @@ final class RecordFormViewModel {
         sideB = SideFormState()
         label = ""
         yearText = ""
+        keywords = ""
         matchSideAArtist = true
         matchSideAPersonnel = true
         matchSideAComposer = true
@@ -67,6 +69,7 @@ final class RecordFormViewModel {
         sideB = sideFormState(from: rowB)
         label = rowA.label ?? rowB.label ?? ""
         yearText = rowA.year.map(String.init) ?? rowB.year.map(String.init) ?? ""
+        keywords = rowA.keywords ?? rowB.keywords ?? ""
         existingImagePathA = rowA.imageStoragePath
         existingImagePathB = rowB.imageStoragePath
         matchSideAArtist = trimmed(rowB.artist ?? "") == trimmed(rowA.artist ?? "")
@@ -165,6 +168,7 @@ final class RecordFormViewModel {
                         composer: opt(sideA.composer),
                         label: sharedLabel,
                         year: year,
+                        keywords: keywords,
                         imageStoragePath: pathA
                     ),
                     RecordSideInsert(
@@ -176,6 +180,7 @@ final class RecordFormViewModel {
                         composer: opt(sideBComposerForSubmit),
                         label: sharedLabel,
                         year: year,
+                        keywords: keywords,
                         imageStoragePath: pathB
                     ),
                 ]
@@ -238,6 +243,7 @@ final class RecordFormViewModel {
                 composer: opt(sideA.composer),
                 label: sharedLabel,
                 year: year,
+                keywords: keywords,
                 imageStoragePath: pathA
             )
             let updateB = RecordSideUpdate(
@@ -247,6 +253,7 @@ final class RecordFormViewModel {
                 composer: opt(sideBComposerForSubmit),
                 label: sharedLabel,
                 year: year,
+                keywords: keywords,
                 imageStoragePath: pathB
             )
 

@@ -28,6 +28,9 @@ struct RecordFormView: View {
                 TextField("Year", text: $vm.yearText)
                     .keyboardType(.numberPad)
             }
+            Section("Keyword(s)") {
+                TextField("Keywords(s)", text: $vm.keywords)
+            }
             Section {
                 Button {
                     Task {
