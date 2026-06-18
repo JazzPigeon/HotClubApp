@@ -11,6 +11,10 @@ class BaseTest: XCTestCase {
     
     let app = XCUIApplication()
     
+    var usesMockDataLayer: Bool {
+        true
+    }
+    
     // if test fails, this flag is false and application exit is handled by TearDown()
     var testRanToCompletion: Bool = false
     
@@ -31,7 +35,8 @@ class BaseTest: XCTestCase {
         // Forward the mock-data flag from the test plan to the app under test.
         // Test plan environment variables apply to the test runner, not the app process,
         // so XCUITest requires forwarding them explicitly via launchEnvironment.
-        if ProcessInfo.processInfo.environment["UITEST_MOCK"] == "1" {
+        if usesMockDataLayer,
+           ProcessInfo.processInfo.environment["UITEST_MOCK"] == "1" {
             app.launchEnvironment["UITEST_MOCK"] = "1"
         }
 
