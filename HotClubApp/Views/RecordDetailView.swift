@@ -179,6 +179,7 @@ struct RecordDetailView: View {
             detailRow(label: "Composer", value: row?.composer)
             detailRow(label: "Label", value: row?.label)
             detailRow(label: "Year", value: row?.year.map(String.init))
+            detailRow(label: "Keyword(s)", value: row?.keywords)
         }
         .padding(.bottom, 24)
     }

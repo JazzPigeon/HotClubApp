@@ -33,6 +33,7 @@ struct RecordSideRow: Decodable, Sendable, Identifiable {
     let composer: String?
     let label: String?
     let year: Int?
+    let keywords: String?
     let imageStoragePath: String?
 
     enum CodingKeys: String, CodingKey {
@@ -45,6 +46,7 @@ struct RecordSideRow: Decodable, Sendable, Identifiable {
         case composer
         case label
         case year
+        case keywords
         case imageStoragePath = "image_storage_path"
     }
 }
@@ -84,6 +86,7 @@ struct RecordSideInsert: Encodable, Sendable {
     let composer: String?
     let label: String?
     let year: Int?
+    let keywords: String?
     let imageStoragePath: String?
 
     enum CodingKeys: String, CodingKey {
@@ -95,6 +98,7 @@ struct RecordSideInsert: Encodable, Sendable {
         case composer
         case label
         case year
+        case keywords
         case imageStoragePath = "image_storage_path"
     }
 }
@@ -106,6 +110,7 @@ struct RecordSideUpdate: Encodable, Sendable {
     let composer: String?
     let label: String?
     let year: Int?
+    let keywords: String?
     let imageStoragePath: String?
 
     enum CodingKeys: String, CodingKey {
@@ -115,6 +120,7 @@ struct RecordSideUpdate: Encodable, Sendable {
         case composer
         case label
         case year
+        case keywords
         case imageStoragePath = "image_storage_path"
     }
 }

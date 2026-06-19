@@ -43,6 +43,7 @@ actor MockRecordRepository: RecordRepository {
                 composer: insert.composer,
                 label: insert.label,
                 year: insert.year,
+                keywords: insert.keywords,
                 imageStoragePath: insert.imageStoragePath
             )
             records[index] = CatalogRecordRow(
@@ -70,6 +71,7 @@ actor MockRecordRepository: RecordRepository {
                 composer: update.composer,
                 label: update.label,
                 year: update.year,
+                keywords: update.keywords,
                 imageStoragePath: update.imageStoragePath
             )
             var newSides = record.recordSides
@@ -107,6 +109,7 @@ extension MockRecordRepository {
                         composer: "Joe Garland",
                         label: "Bluebird",
                         year: 1939,
+                        keywords: "Dance",
                         imageStoragePath: nil
                     ),
                     RecordSideRow(
@@ -119,6 +122,7 @@ extension MockRecordRepository {
                         composer: "Vincent Youmans",
                         label: "Bluebird",
                         year: 1939,
+                        keywords: "",
                         imageStoragePath: nil
                     ),
                 ]
@@ -138,6 +142,7 @@ extension MockRecordRepository {
                         composer: "Billy Strayhorn",
                         label: "Victor",
                         year: 1941,
+                        keywords: "Cotton Club",
                         imageStoragePath: nil
                     ),
                     RecordSideRow(
@@ -150,6 +155,7 @@ extension MockRecordRepository {
                         composer: "Charles B. Lawlor",
                         label: "Victor",
                         year: 1941,
+                        keywords: "Cotton Club",
                         imageStoragePath: nil
                     ),
                 ]
