@@ -30,6 +30,7 @@ struct RecordsListView: View {
                         NavigationLink(value: record) {
                             RecordSummaryRow(record: record, imageStore: app.imageStore)
                         }
+                        .accessibilityIdentifier("RecordListCell")
                         .listRowBackground(theme.secondaryBackground)
                     }
                 }
