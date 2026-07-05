@@ -26,12 +26,19 @@ struct RecordsListView: View {
                         Text("Add a record from the Add tab.")
                     }
                 } else {
-                    List(records) { record in
-                        NavigationLink(value: record) {
-                            RecordSummaryRow(record: record, imageStore: app.imageStore)
+                    List {
+                        ForEach(records) { record in
+                            NavigationLink(value: record) {
+                                RecordSummaryRow(record: record, imageStore: app.imageStore)
+                            }
+                            .accessibilityIdentifier("RecordListCell")
+                            .listRowBackground(theme.secondaryBackground)
                         }
-                        .accessibilityIdentifier("RecordListCell")
-                        .listRowBackground(theme.secondaryBackground)
+                        
+                        Text("End of list")
+                            .accessibilityIdentifier("EndOfList")
+                            .foregroundStyle(theme.secondaryText)
+                            .listRowBackground(theme.secondaryBackground)
                     }
                 }
             }
