@@ -24,13 +24,16 @@ struct LoginView: View {
                         .textContentType(.username)
                         .textInputAutocapitalization(.never)
                         .keyboardType(.emailAddress)
+                        .accessibilityIdentifier("EmailTextField")
                     SecureField("Password", text: $password)
                         .textContentType(mode == .signIn ? .password : .newPassword)
+                        .accessibilityIdentifier("PasswordTextField")
                 }
                 if let errorMessage {
                     Section {
                         Text(errorMessage)
                             .foregroundStyle(.red)
+                            .accessibilityIdentifier("ErrorMessage")
                     }
                 }
                 Section {
