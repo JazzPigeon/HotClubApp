@@ -92,6 +92,7 @@ struct RecordDetailView: View {
         } message: {
             Text(actionError ?? "")
         }
+        .task(id: record.id) { await reloadRecord() }
         .task(id: refreshToken) { await loadImages() }
     }
 
@@ -177,9 +178,9 @@ struct RecordDetailView: View {
             detailRow(label: "Artist", value: row?.artist)
             personnelDetailRow(value: row?.personnel)
             detailRow(label: "Composer", value: row?.composer)
-            detailRow(label: "Label", value: row?.label)
-            detailRow(label: "Year", value: row?.year.map(String.init))
-            detailRow(label: "Keyword(s)", value: row?.keywords)
+            detailRow(label: "Label", value: sharedLabel)
+            detailRow(label: "Year", value: sharedYearText)
+            detailRow(label: "Keyword(s)", value: sharedKeywords)
         }
         .padding(.bottom, 24)
     }
@@ -225,6 +226,27 @@ struct RecordDetailView: View {
     private func displayValue(_ value: String?) -> String {
         let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         return trimmed.isEmpty ? "—" : trimmed
+    }
+
+    private var sharedLabel: String {
+        firstNonEmpty(sideA?.label, sideB?.label)
+    }
+
+    private var sharedYearText: String {
+        if let year = sideA?.year ?? sideB?.year {
+            return String(year)
+        }
+        return ""
+    }
+
+    private var sharedKeywords: String {
+        firstNonEmpty(sideA?.keywords, sideB?.keywords)
+    }
+
+    private func firstNonEmpty(_ values: String?...) -> String {
+        values
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .first { !$0.isEmpty } ?? ""
     }
 
     private func loadImages() async {
