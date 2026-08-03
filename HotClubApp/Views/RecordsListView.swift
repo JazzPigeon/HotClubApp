@@ -5,8 +5,13 @@ struct RecordsListView: View {
     @Environment(\.appTheme) private var theme
 
     @State private var records: [CatalogRecordRow] = []
+    @State private var searchText = ""
     @State private var loadError: String?
     @State private var isLoading = false
+
+    private var filteredRecords: [CatalogRecordRow] {
+        records.filter { $0.matchesSearch(searchText) }
+    }
 
     var body: some View {
         NavigationStack {
@@ -25,20 +30,21 @@ struct RecordsListView: View {
                     } description: {
                         Text("Add a record from the Add tab.")
                     }
+                } else if filteredRecords.isEmpty {
+                    ContentUnavailableView {
+                        Label("No matching records", systemImage: "magnifyingglass")
+                    } description: {
+                        Text("Try a different search.")
+                    }
                 } else {
                     List {
-                        ForEach(records) { record in
+                        ForEach(filteredRecords) { record in
                             NavigationLink(value: record) {
                                 RecordSummaryRow(record: record, imageStore: app.imageStore)
                             }
                             .accessibilityIdentifier("RecordListCell")
                             .listRowBackground(theme.secondaryBackground)
                         }
-                        
-                        Text("End of list")
-                            .accessibilityIdentifier("EndOfList")
-                            .foregroundStyle(theme.secondaryText)
-                            .listRowBackground(theme.secondaryBackground)
                     }
                 }
             }
@@ -48,6 +54,7 @@ struct RecordsListView: View {
                 }
             }
             .navigationTitle("Records")
+            .searchable(text: $searchText, prompt: "Search records")
             .scrollContentBackground(.hidden)
             .background(theme.background)
             .onAppear { Task { await load() } }

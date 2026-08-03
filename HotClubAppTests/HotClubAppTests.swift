@@ -54,4 +54,52 @@ struct HotClubAppTests {
         #expect(row.side(.B)?.songTitle == "Copenhagen")
         #expect(row.side(.B)?.imageStoragePath == nil)
     }
+
+    @Test func catalogRecordRowMatchesSearchAcrossSearchableFields() {
+        let record = CatalogRecordRow(
+            id: UUID(),
+            createdAt: Date(),
+            updatedAt: Date(),
+            recordSides: [
+                RecordSideRow(
+                    id: UUID(),
+                    recordId: UUID(),
+                    side: .A,
+                    songTitle: "In the Mood",
+                    artist: "Glenn Miller",
+                    personnel: "Tex Beneke; sax",
+                    composer: "Joe Garland",
+                    label: "Bluebird",
+                    year: 1939,
+                    keywords: "swing; dance",
+                    imageStoragePath: nil
+                ),
+                RecordSideRow(
+                    id: UUID(),
+                    recordId: UUID(),
+                    side: .B,
+                    songTitle: "A String of Pearls",
+                    artist: "Glenn Miller",
+                    personnel: nil,
+                    composer: "Jerry Gray",
+                    label: "Bluebird",
+                    year: 1941,
+                    keywords: nil,
+                    imageStoragePath: nil
+                ),
+            ]
+        )
+
+        #expect(record.matchesSearch(""))
+        #expect(record.matchesSearch("   "))
+        #expect(record.matchesSearch("mood"))
+        #expect(record.matchesSearch("GLENN"))
+        #expect(record.matchesSearch("beneke"))
+        #expect(record.matchesSearch("bluebird"))
+        #expect(record.matchesSearch("garland"))
+        #expect(record.matchesSearch("swing"))
+        #expect(record.matchesSearch("pearls"))
+        #expect(!record.matchesSearch("1939"))
+        #expect(!record.matchesSearch("not-a-match"))
+    }
 }
