@@ -69,7 +69,7 @@ final class RecordFormViewModel {
         sideB = sideFormState(from: rowB)
         label = rowA.label ?? rowB.label ?? ""
         yearText = rowA.year.map(String.init) ?? rowB.year.map(String.init) ?? ""
-        keywords = rowA.keywords ?? rowB.keywords ?? ""
+        keywords = firstNonEmpty(rowA.keywords, rowB.keywords)
         existingImagePathA = rowA.imageStoragePath
         existingImagePathB = rowB.imageStoragePath
         matchSideAArtist = trimmed(rowB.artist ?? "") == trimmed(rowA.artist ?? "")
@@ -308,6 +308,12 @@ final class RecordFormViewModel {
             throw RecordFormValidationError.invalidYear
         }
         return y
+    }
+    
+    private func firstNonEmpty(_ values: String?...) -> String {
+        values
+            .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .first { !$0.isEmpty } ?? ""
     }
 }
 
