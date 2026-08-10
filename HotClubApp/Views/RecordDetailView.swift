@@ -111,13 +111,13 @@ struct RecordDetailView: View {
     @ViewBuilder
     private func sidePanel(side: RecordSideCode, row: RecordSideRow?, imageURL: URL?) -> some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("Side \(side.rawValue)")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(theme.secondaryText)
-
             squareImage(url: imageURL)
                 .contentShape(Rectangle())
                 .onTapGesture { flipSides() }
+
+            Text("Side \(side.rawValue)")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(theme.secondaryText)
 
             metadataSection(row: row)
         }
@@ -180,6 +180,13 @@ struct RecordDetailView: View {
             detailRow(label: "Composer", value: row?.composer)
             detailRow(label: "Label", value: sharedLabel)
             detailRow(label: "Year", value: sharedYearText)
+
+            Divider()
+                .background(theme.secondaryText.opacity(0.35))
+                .padding(.vertical, 4)
+
+            notesDetailRow(value: row?.notes)
+
             detailRow(label: "Keyword(s)", value: sharedKeywords)
         }
         .padding(.bottom, 24)
@@ -193,6 +200,23 @@ struct RecordDetailView: View {
                 .font(.caption)
                 .foregroundStyle(theme.secondaryText)
             Text(trimmed.isEmpty ? "—" : formattedPersonnel(trimmed))
+                .font(.body)
+                .foregroundStyle(theme.primaryText)
+                .multilineTextAlignment(.leading)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    @ViewBuilder
+    private func notesDetailRow(value: String?) -> some View {
+        let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Notes")
+                .font(.caption)
+                .foregroundStyle(theme.secondaryText)
+            Text(trimmed.isEmpty ? "—" : trimmed)
                 .font(.body)
                 .foregroundStyle(theme.primaryText)
                 .multilineTextAlignment(.leading)

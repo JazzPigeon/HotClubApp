@@ -61,6 +61,7 @@ struct RecordFormView: View {
 
     @ViewBuilder
     private func sideFields(side: Binding<SideFormState>, showsPersonnel: Bool) -> some View {
+        SideImageField(croppedPhotoJPEG: side.croppedPhotoJPEG)
         TextField("Song title (required)", text: side.songTitle)
         TextField("Artist", text: side.artist)
         if showsPersonnel {
@@ -68,11 +69,13 @@ struct RecordFormView: View {
                 .lineLimit(3 ... 8)
         }
         TextField("Composer", text: side.composer)
-        SideImageField(croppedPhotoJPEG: side.croppedPhotoJPEG)
+        TextField("Notes", text: side.notes, axis: .vertical)
+            .lineLimit(3 ... 10)
     }
 
     @ViewBuilder
     private var sideBFields: some View {
+        SideImageField(croppedPhotoJPEG: $vm.sideB.croppedPhotoJPEG)
         TextField("Song title (required)", text: $vm.sideB.songTitle)
         TextField("Artist", text: $vm.sideB.artist)
             .disabled(vm.matchSideAArtist)
@@ -86,6 +89,7 @@ struct RecordFormView: View {
         TextField("Composer", text: $vm.sideB.composer)
             .disabled(vm.matchSideAComposer)
         Toggle("Composer - Match Side A", isOn: $vm.matchSideAComposer)
-        SideImageField(croppedPhotoJPEG: $vm.sideB.croppedPhotoJPEG)
+        TextField("Notes", text: $vm.sideB.notes, axis: .vertical)
+            .lineLimit(3 ... 10)
     }
 }

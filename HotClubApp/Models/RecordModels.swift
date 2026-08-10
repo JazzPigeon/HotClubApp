@@ -34,6 +34,7 @@ struct RecordSideRow: Decodable, Sendable, Identifiable {
     let label: String?
     let year: Int?
     let keywords: String?
+    let notes: String?
     let imageStoragePath: String?
 
     enum CodingKeys: String, CodingKey {
@@ -47,6 +48,7 @@ struct RecordSideRow: Decodable, Sendable, Identifiable {
         case label
         case year
         case keywords
+        case notes
         case imageStoragePath = "image_storage_path"
     }
 }
@@ -89,7 +91,7 @@ struct CatalogRecordRow: Decodable, Sendable, Identifiable, Hashable {
 
 extension RecordSideRow {
     func matchesSearch(_ query: String) -> Bool {
-        let fields = [songTitle, artist, personnel, label, composer, keywords, year.map(String.init)]
+        let fields = [songTitle, artist, personnel, label, composer, keywords, notes, year.map(String.init)]
         return fields.contains { field in
             guard let field else { return false }
             return field.range(of: query, options: [.caseInsensitive, .diacriticInsensitive]) != nil
@@ -107,6 +109,7 @@ struct RecordSideInsert: Encodable, Sendable {
     let label: String?
     let year: Int?
     let keywords: String?
+    let notes: String?
     let imageStoragePath: String?
 
     enum CodingKeys: String, CodingKey {
@@ -119,6 +122,7 @@ struct RecordSideInsert: Encodable, Sendable {
         case label
         case year
         case keywords
+        case notes
         case imageStoragePath = "image_storage_path"
     }
 }
@@ -131,6 +135,7 @@ struct RecordSideUpdate: Encodable, Sendable {
     let label: String?
     let year: Int?
     let keywords: String?
+    let notes: String?
     let imageStoragePath: String?
 
     enum CodingKeys: String, CodingKey {
@@ -141,6 +146,7 @@ struct RecordSideUpdate: Encodable, Sendable {
         case label
         case year
         case keywords
+        case notes
         case imageStoragePath = "image_storage_path"
     }
 }
