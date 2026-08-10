@@ -6,7 +6,8 @@ struct RecordDetailView: View {
 
     let repository: RecordRepository?
     let imageStore: ImageStore?
-    var onRecordChanged: () -> Void = {}
+    var onRecordChanged: () async -> Void = {}
+    var onRecordDeleted: (UUID) async -> Void = { _ in }
 
     @State private var record: CatalogRecordRow
     @State private var showingSideB = false
@@ -23,11 +24,13 @@ struct RecordDetailView: View {
         record: CatalogRecordRow,
         repository: RecordRepository?,
         imageStore: ImageStore?,
-        onRecordChanged: @escaping () -> Void = {}
+        onRecordChanged: @escaping () async -> Void = {},
+        onRecordDeleted: @escaping (UUID) async -> Void = { _ in }
     ) {
         self.repository = repository
         self.imageStore = imageStore
         self.onRecordChanged = onRecordChanged
+        self.onRecordDeleted = onRecordDeleted
         _record = State(initialValue: record)
     }
 
@@ -73,7 +76,7 @@ struct RecordDetailView: View {
         .navigationDestination(isPresented: $showEdit) {
             EditRecordView(record: record) {
                 await reloadRecord()
-                onRecordChanged()
+                await onRecordChanged()
             }
         }
         .alert("Delete record?", isPresented: $showDeleteConfirm) {
@@ -308,14 +311,15 @@ struct RecordDetailView: View {
         isDeleting = true
         defer { isDeleting = false }
 
+        let deletedId = record.id
         let paths = [sideA?.imageStoragePath, sideB?.imageStoragePath]
             .compactMap { $0 }
             .filter { !$0.isEmpty }
 
         do {
             try? await imageStore?.delete(paths: paths)
-            try await repository.deleteRecord(id: record.id)
-            onRecordChanged()
+            try await repository.deleteRecord(id: deletedId)
+            await onRecordDeleted(deletedId)
             dismiss()
         } catch {
             actionError = error.localizedDescription
