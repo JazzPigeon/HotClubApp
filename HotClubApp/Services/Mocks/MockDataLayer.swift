@@ -44,6 +44,7 @@ actor MockRecordRepository: RecordRepository {
                 label: insert.label,
                 year: insert.year,
                 keywords: insert.keywords,
+                notes: insert.notes,
                 imageStoragePath: insert.imageStoragePath
             )
             records[index] = CatalogRecordRow(
@@ -72,6 +73,7 @@ actor MockRecordRepository: RecordRepository {
                 label: update.label,
                 year: update.year,
                 keywords: update.keywords,
+                notes: update.notes,
                 imageStoragePath: update.imageStoragePath
             )
             var newSides = record.recordSides
@@ -110,6 +112,7 @@ extension MockRecordRepository {
                         label: "Bluebird",
                         year: 1939,
                         keywords: "Dance",
+                        notes: nil,
                         imageStoragePath: nil
                     ),
                     RecordSideRow(
@@ -123,6 +126,7 @@ extension MockRecordRepository {
                         label: "Bluebird",
                         year: 1939,
                         keywords: "",
+                        notes: nil,
                         imageStoragePath: nil
                     ),
                 ]
@@ -143,6 +147,7 @@ extension MockRecordRepository {
                         label: "Victor",
                         year: 1941,
                         keywords: "Cotton Club",
+                        notes: nil,
                         imageStoragePath: nil
                     ),
                     RecordSideRow(
@@ -156,6 +161,7 @@ extension MockRecordRepository {
                         label: "Victor",
                         year: 1941,
                         keywords: "Cotton Club",
+                        notes: nil,
                         imageStoragePath: nil
                     ),
                 ]

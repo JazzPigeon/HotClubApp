@@ -72,6 +72,7 @@ struct HotClubAppTests {
                     label: "Bluebird",
                     year: 1939,
                     keywords: "swing; dance",
+                    notes: "Fox trot pressing",
                     imageStoragePath: nil
                 ),
                 RecordSideRow(
@@ -85,6 +86,7 @@ struct HotClubAppTests {
                     label: "Bluebird",
                     year: 1941,
                     keywords: nil,
+                    notes: nil,
                     imageStoragePath: nil
                 ),
             ]
@@ -101,6 +103,7 @@ struct HotClubAppTests {
         #expect(record.matchesSearch("pearls"))
         #expect(record.matchesSearch("1939"))
         #expect(record.matchesSearch("1941"))
+        #expect(record.matchesSearch("fox trot"))
         #expect(!record.matchesSearch("not-a-match"))
     }
 }

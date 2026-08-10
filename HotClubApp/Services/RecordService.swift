@@ -5,7 +5,7 @@ struct RecordService: RecordRepository {
     let client: SupabaseClient
 
     private static let catalogSelect =
-        "id, created_at, updated_at, record_sides(id, record_id, side, song_title, artist, personnel, composer, label, year, keywords, image_storage_path)"
+        "id, created_at, updated_at, record_sides(id, record_id, side, song_title, artist, personnel, composer, label, year, keywords, notes, image_storage_path)"
 
     func fetchCatalogRecords() async throws -> [CatalogRecordRow] {
         try await client

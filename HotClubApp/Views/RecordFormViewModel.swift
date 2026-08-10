@@ -5,6 +5,7 @@ struct SideFormState {
     var artist = ""
     var personnel = ""
     var composer = ""
+    var notes = ""
     var croppedPhotoJPEG: Data?
 }
 
@@ -169,6 +170,7 @@ final class RecordFormViewModel {
                         label: sharedLabel,
                         year: year,
                         keywords: keywords,
+                        notes: opt(sideA.notes),
                         imageStoragePath: pathA
                     ),
                     RecordSideInsert(
@@ -181,6 +183,7 @@ final class RecordFormViewModel {
                         label: sharedLabel,
                         year: year,
                         keywords: keywords,
+                        notes: opt(sideB.notes),
                         imageStoragePath: pathB
                     ),
                 ]
@@ -244,6 +247,7 @@ final class RecordFormViewModel {
                 label: sharedLabel,
                 year: year,
                 keywords: keywords,
+                notes: opt(sideA.notes),
                 imageStoragePath: pathA
             )
             let updateB = RecordSideUpdate(
@@ -254,6 +258,7 @@ final class RecordFormViewModel {
                 label: sharedLabel,
                 year: year,
                 keywords: keywords,
+                notes: opt(sideB.notes),
                 imageStoragePath: pathB
             )
 
@@ -271,7 +276,8 @@ final class RecordFormViewModel {
             songTitle: row.songTitle ?? "",
             artist: row.artist ?? "",
             personnel: row.personnel ?? "",
-            composer: row.composer ?? ""
+            composer: row.composer ?? "",
+            notes: row.notes ?? ""
         )
     }
 
