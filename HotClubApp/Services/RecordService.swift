@@ -31,9 +31,10 @@ struct RecordService: RecordRepository {
     }
 
     func insertRecord() async throws -> UUID {
+        let session = try await client.auth.session
         let rows: [RecordRow] = try await client
             .from("records")
-            .insert(NewRecordInsert())
+            .insert(NewRecordInsert(userId: session.user.id))
             .select("id, user_id, created_at, updated_at")
             .execute()
             .value
@@ -60,14 +61,21 @@ struct RecordService: RecordRepository {
 
     func deleteRecord(id: UUID) async throws {
         try await client
-            .from("records")
-            .delete()
-            .eq("id", value: id.uuidString)
+            .rpc("delete_own_record", params: ["p_record_id": id.uuidString.lowercased()])
             .execute()
     }
 }
 
-enum RecordServiceError: Error {
+enum RecordServiceError: LocalizedError {
     case missingInsertedId
     case recordNotFound
+
+    var errorDescription: String? {
+        switch self {
+        case .missingInsertedId:
+            return "Could not create the record."
+        case .recordNotFound:
+            return "Record not found."
+        }
+    }
 }

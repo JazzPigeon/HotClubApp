@@ -49,9 +49,18 @@ struct RecordsListView: View {
                 }
             }
             .navigationDestination(for: CatalogRecordRow.self) { record in
-                RecordDetailView(record: record, repository: app.recordRepository, imageStore: app.imageStore) {
-                    Task { await load() }
-                }
+                RecordDetailView(
+                    record: record,
+                    repository: app.recordRepository,
+                    imageStore: app.imageStore,
+                    onRecordChanged: {
+                        await load()
+                    },
+                    onRecordDeleted: { id in
+                        records.removeAll { $0.id == id }
+                        await load()
+                    }
+                )
             }
             .navigationTitle("Records")
             .searchable(text: $searchText, prompt: "Search records")

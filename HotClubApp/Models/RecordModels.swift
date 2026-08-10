@@ -6,7 +6,11 @@ enum RecordSideCode: String, Codable, Sendable, CaseIterable {
 }
 
 struct NewRecordInsert: Encodable, Sendable {
-    init() {}
+    let userId: UUID
+
+    enum CodingKeys: String, CodingKey {
+        case userId = "user_id"
+    }
 }
 
 struct RecordRow: Decodable, Sendable, Identifiable {
