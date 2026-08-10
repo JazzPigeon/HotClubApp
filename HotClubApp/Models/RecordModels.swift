@@ -89,7 +89,7 @@ struct CatalogRecordRow: Decodable, Sendable, Identifiable, Hashable {
 
 extension RecordSideRow {
     func matchesSearch(_ query: String) -> Bool {
-        let fields = [songTitle, artist, personnel, label, composer, keywords]
+        let fields = [songTitle, artist, personnel, label, composer, keywords, year.map(String.init)]
         return fields.contains { field in
             guard let field else { return false }
             return field.range(of: query, options: [.caseInsensitive, .diacriticInsensitive]) != nil

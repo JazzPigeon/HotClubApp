@@ -99,7 +99,8 @@ struct HotClubAppTests {
         #expect(record.matchesSearch("garland"))
         #expect(record.matchesSearch("swing"))
         #expect(record.matchesSearch("pearls"))
-        #expect(!record.matchesSearch("1939"))
+        #expect(record.matchesSearch("1939"))
+        #expect(record.matchesSearch("1941"))
         #expect(!record.matchesSearch("not-a-match"))
     }
 }
