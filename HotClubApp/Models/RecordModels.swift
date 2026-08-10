@@ -68,12 +68,32 @@ struct CatalogRecordRow: Decodable, Sendable, Identifiable, Hashable {
         recordSides.first { $0.side == code }
     }
 
+    /// Case-insensitive substring match across either side's searchable fields.
+    func matchesSearch(_ query: String) -> Bool {
+        let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return true }
+
+        return recordSides.contains { side in
+            side.matchesSearch(trimmed)
+        }
+    }
+
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
 
     static func == (lhs: CatalogRecordRow, rhs: CatalogRecordRow) -> Bool {
         lhs.id == rhs.id
+    }
+}
+
+extension RecordSideRow {
+    func matchesSearch(_ query: String) -> Bool {
+        let fields = [songTitle, artist, personnel, label, composer, keywords, year.map(String.init)]
+        return fields.contains { field in
+            guard let field else { return false }
+            return field.range(of: query, options: [.caseInsensitive, .diacriticInsensitive]) != nil
+        }
     }
 }
 
