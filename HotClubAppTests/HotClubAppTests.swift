@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 import Testing
 @testable import HotClubApp
 
@@ -105,5 +106,88 @@ struct HotClubAppTests {
         #expect(record.matchesSearch("1941"))
         #expect(record.matchesSearch("fox trot"))
         #expect(!record.matchesSearch("not-a-match"))
+    }
+
+    @Test func appThemeIncludesNewPresetsAndCustom() {
+        let names = AppTheme.allCases.map(\.rawValue)
+        #expect(names.contains("sepia"))
+        #expect(names.contains("emerald"))
+        #expect(names.contains("champagne"))
+        #expect(names.contains("custom"))
+        #expect(AppTheme.sepia.builtInPalette.preferredColorScheme == .light)
+        #expect(AppTheme.emerald.builtInPalette.preferredColorScheme == .dark)
+        #expect(AppTheme.champagne.builtInPalette.preferredColorScheme == .light)
+    }
+
+    @Test func customThemeColorsRoundTripsThroughJSON() {
+        var custom = CustomThemeColors.default
+        custom.accent = RGBAColor(red: 0.1, green: 0.2, blue: 0.3)
+        custom.appearance = .dark
+
+        let decoded = CustomThemeColors.decode(from: custom.json)
+        #expect(decoded.accent.red == 0.1)
+        #expect(decoded.accent.green == 0.2)
+        #expect(decoded.accent.blue == 0.3)
+        #expect(decoded.appearance == .dark)
+    }
+
+    @Test func resolveUsesSelectedSavedCustomTheme() {
+        var library = CustomThemeLibrary.default
+        library.updateSelected { $0.colors.appearance = .dark }
+
+        let palette = AppTheme.resolve(
+            selectionRaw: AppTheme.custom.rawValue,
+            customLibraryJSON: library.json
+        )
+        #expect(palette.preferredColorScheme == .dark)
+
+        let shellac = AppTheme.resolve(
+            selectionRaw: AppTheme.shellac.rawValue,
+            customLibraryJSON: library.json
+        )
+        #expect(shellac.preferredColorScheme == .light)
+    }
+
+    @Test func customThemeLibrarySupportsCreateDuplicateAndDelete() {
+        var library = CustomThemeLibrary.default
+        #expect(library.themes.count == 1)
+
+        library.addTheme(named: "Night Desk")
+        #expect(library.themes.count == 2)
+        #expect(library.selectedTheme.name == "Night Desk")
+
+        library.duplicateSelected()
+        #expect(library.themes.count == 3)
+        #expect(library.selectedTheme.name == "Night Desk Copy")
+
+        let deletedCopy = library.deleteSelected()
+        #expect(deletedCopy)
+        #expect(library.themes.count == 2)
+
+        library.selectedThemeID = library.themes[0].id
+        let deletedFirst = library.deleteSelected()
+        #expect(deletedFirst)
+        #expect(library.themes.count == 1)
+        let deletedLast = library.deleteSelected()
+        #expect(!deletedLast)
+    }
+
+    @Test func customThemeLibraryMigratesLegacySingleCustomJSON() {
+        var legacy = CustomThemeColors.default
+        legacy.appearance = .dark
+        legacy.accent = RGBAColor(red: 0.2, green: 0.3, blue: 0.4)
+
+        let migrated = CustomThemeLibrary.decode(from: "", legacyCustomJSON: legacy.json)
+        #expect(migrated.themes.count == 1)
+        #expect(migrated.selectedTheme.colors.appearance == .dark)
+        #expect(migrated.selectedTheme.colors.accent.red == 0.2)
+    }
+
+    @Test func decodeInvalidCustomThemeJSONFallsBackToDefault() {
+        let decoded = CustomThemeColors.decode(from: "not-json")
+        #expect(decoded == CustomThemeColors.default)
+
+        let library = CustomThemeLibrary.decode(from: "not-json")
+        #expect(library == CustomThemeLibrary.default)
     }
 }

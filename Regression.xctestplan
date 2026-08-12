@@ -19,6 +19,13 @@
   },
   "testTargets" : [
     {
+      "target" : {
+        "containerPath" : "container:HotClubApp.xcodeproj",
+        "identifier" : "9604533C2E9D7B9B005B15AE",
+        "name" : "HotClubAppTests"
+      }
+    },
+    {
       "selectedTests" : [
         "LogInScreenTests\/test_tapSignInButton()",
         "RecordsListScreenTests\/test_recordsListShowsSeededRecords()"
